@@ -1,1 +1,25 @@
-# SleekBoard_Client
+# SleekBoard Client
+
+React + Vite front end for SleekBoard. Talks to the Express API in SleekBoard_Server.
+
+## Getting started
+
+```
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Vite serves on http://localhost:5173. `VITE_API_URL` points at the API, `/api/health` is wired up on the home page so you can see the two talking.
+
+## Layout
+
+```
+src/
+  main.jsx         mounts the app
+  App.jsx          routes
+  index.css        tailwind + global styles
+  components/      shared pieces like Layout
+  pages/           one file per route
+  services/        axios instance and the api calls built on it
+```
