@@ -7,13 +7,13 @@ const COLUMNS = ["Company", "Role", "Location", "Status", "Applied", "Deadline",
 export default function JobTable({ jobs, selectedId, onOpen })
   {
     return (
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface">
+      <div className="overflow-hidden rounded-2xl bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] border-collapse text-[13px]">
             <thead>
-              <tr className="border-b border-line text-left text-[12px] font-medium text-ink-3">
+              <tr className="text-left text-[12px] font-medium text-ink-3">
                 {COLUMNS.map((column) => (
-                  <th key={column} scope="col" className="h-11 px-4 font-medium first:pl-5 last:pr-5">{column}</th>
+                  <th key={column} scope="col" className="h-11 bg-canvas/40 px-4 font-medium first:pl-5 last:pr-5">{column}</th>
                 ))}
               </tr>
             </thead>
@@ -26,7 +26,7 @@ export default function JobTable({ jobs, selectedId, onOpen })
                   <tr
                     key={job.id}
                     onClick={() => onOpen(job.id)}
-                    className={`cursor-pointer border-b border-line transition-colors duration-100 last:border-b-0 hover:bg-white/[0.03] active:bg-white/[0.06] ${selected ? "bg-white/[0.04]" : ""}`}
+                    className={`cursor-pointer transition-colors duration-100 hover:bg-raised active:bg-raised ${selected ? "bg-raised" : ""}`}
                   >
                     <td className="h-13 px-4 pl-5">
                       <span className="flex items-center gap-2.5">

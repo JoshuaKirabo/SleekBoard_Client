@@ -19,7 +19,7 @@ const laneAt = (x, y) =>
 // under each lane title carries the status colour, so the row of rails reads as the pipeline left to right.
 // Drag a card across and the lane it's over lights up. The landing ref hands the drop point to the card's new
 // instance so it can spring into place from there.
-export default function JobBoard({ jobs, selectedId, onOpen, onMove })
+export default function JobBoard({ jobs, selectedId, onOpen, onMove, freshId })
   {
     const [over, setOver] = useState(null);
     const landing = useRef(null);
@@ -48,10 +48,10 @@ export default function JobBoard({ jobs, selectedId, onOpen, onMove })
               <ul className="mt-3 flex flex-1 flex-col gap-2.5 pb-2">
                 {lane.map((job) => (
                   <li key={job.id}>
-                    <JobCard job={job} selected={job.id === selectedId} onOpen={onOpen} onMove={onMove} laneAt={laneAt} onHover={hover} landing={landing} />
+                    <JobCard job={job} selected={job.id === selectedId} fresh={job.id === freshId} onOpen={onOpen} onMove={onMove} laneAt={laneAt} onHover={hover} landing={landing} />
                   </li>
                 ))}
-                {lane.length === 0 && <li className={`rounded-xl border border-dashed px-3.5 py-5 text-center text-[12px] transition-colors duration-150 ${active ? "border-line-strong text-ink-2" : "border-line text-ink-3"}`}>{active ? "Drop it here" : status.empty}</li>}
+                {lane.length === 0 && <li className={`rounded-xl px-3.5 py-5 text-center text-[12px] transition-colors duration-150 ${active ? "bg-raised text-ink-2" : "bg-surface/50 text-ink-3"}`}>{active ? "Drop it here" : status.empty}</li>}
               </ul>
             </section>
           );

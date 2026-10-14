@@ -1,8 +1,8 @@
 // The six lanes, in the order an application actually moves through them. The dot colour comes from the
-// brand scale instead of a rainbow of tints: muted while saved, Board Blue once sent, cream in the room,
+// brand scale instead of a rainbow of tints: muted while it is still to apply, Board Blue once sent, cream in the room,
 // white when the offer lands, faded once rejected, and just an outline when they went quiet on you.
 export const STATUSES = [
-  { id: "saved", label: "Saved", dot: "bg-ink-3", rail: "bg-ink-3", empty: "Save a role you want to apply to." },
+  { id: "saved", label: "To Apply", dot: "bg-ink-3", rail: "bg-ink-3", empty: "Save a role you want to apply to." },
   { id: "applied", label: "Applied", dot: "bg-board-bright", rail: "bg-board-bright", empty: "Nothing sent yet." },
   { id: "interviewing", label: "Interviewing", dot: "bg-cream", rail: "bg-cream", empty: "No interviews on the calendar." },
   { id: "offer", label: "Offer", dot: "bg-ink", rail: "bg-ink", empty: "No offers yet. Keep going." },

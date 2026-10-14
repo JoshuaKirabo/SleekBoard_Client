@@ -29,7 +29,7 @@ const FLICK_SPEED = 700;
 // One application. Tap it to open the panel, or drag it into another lane. The outer wrapper carries the live
 // translate while you drag, the button underneath carries the lift (scale and shadow) through a CSS transition,
 // so letting go never pops.
-export default function JobCard({ job, selected, onOpen, onMove, laneAt, onHover, landing })
+export default function JobCard({ job, selected, fresh, onOpen, onMove, laneAt, onHover, landing })
   {
     const wrapper = useRef(null);
     const drag = useRef(null);
@@ -143,7 +143,7 @@ export default function JobCard({ job, selected, onOpen, onMove, laneAt, onHover
       };
 
     return (
-      <div ref={wrapper} className={`relative ${lifted ? "z-20 pointer-events-none" : ""}`}>
+      <div ref={wrapper} className={`relative ${fresh ? "card-rise" : ""} ${lifted ? "z-20 pointer-events-none" : ""}`}>
         <button
           type="button"
           onClick={onClick}
@@ -152,11 +152,11 @@ export default function JobCard({ job, selected, onOpen, onMove, laneAt, onHover
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           aria-pressed={selected}
-          className={`job-card group w-full cursor-grab rounded-xl border bg-surface p-3.5 text-left transition-[transform,border-color,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream ${lifted ? "scale-[1.03] cursor-grabbing border-line-strong shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]" : "hover:border-line-strong active:scale-[0.985]"} ${selected ? "border-cream/60" : "border-line"}`}
+          className={`job-card group w-full cursor-grab rounded-xl p-3.5 text-left transition-[transform,background-color,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream ${lifted ? "scale-[1.03] cursor-grabbing bg-raised shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]" : "hover:bg-raised active:scale-[0.985]"} ${selected ? "bg-raised" : "bg-surface"}`}
         >
           <div className="flex items-center gap-2.5">
             <Monogram name={job.company} />
-            <span className="truncate text-[13px] font-semibold">{job.company}</span>
+            <span className={`truncate text-[13px] font-semibold transition-colors duration-150 ${selected ? "text-cream" : ""}`}>{job.company}</span>
           </div>
 
           <p className="mt-2.5 text-[13px] leading-snug text-ink">{job.role}</p>

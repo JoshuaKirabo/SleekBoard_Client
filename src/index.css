@@ -23,6 +23,9 @@
 
       --color-cream: #dbd8ce;
       --color-stone: #8a8679;
+
+      /* A stronger ease-out than the browser's. Arrives fast, lands soft. */
+      --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
    }
 
 :root
@@ -69,4 +72,60 @@ body
          {
             touch-action: none;
          }
+   }
+
+/* The add-job sheet's contents arrive in a short cascade after the sheet itself, each block a beat after the
+   one above it. Only runs on open; the class is dropped when the sheet closes so the next open starts fresh. */
+@keyframes rise
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(10px);
+         }
+      to
+         {
+            opacity: 1;
+            transform: translateY(0);
+         }
+   }
+
+.rise
+   {
+      animation: rise 480ms var(--ease-out-strong) both;
+      animation-delay: calc(90ms + var(--i, 0) * 40ms);
+   }
+
+/* A card that was just added to the board comes up out of its lane instead of blinking into place. Fill is
+   backwards only, so once it lands the drag code owns the transform again. */
+.card-rise
+   {
+      animation: rise 420ms var(--ease-out-strong) backwards;
+   }
+
+@media (prefers-reduced-motion: reduce)
+   {
+      .rise,
+      .card-rise
+         {
+            animation-name: none;
+         }
+   }
+
+/* When the link reader writes a field, the well lights cream for a beat and settles. One pass, no loop. */
+@keyframes well-landed
+   {
+      from
+         {
+            box-shadow: inset 0 0 0 2px var(--color-cream);
+         }
+      to
+         {
+            box-shadow: inset 0 0 0 2px transparent;
+         }
+   }
+
+.well-landed
+   {
+      animation: well-landed 900ms ease-out 1;
    }

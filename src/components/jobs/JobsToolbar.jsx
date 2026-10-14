@@ -9,7 +9,7 @@ const VIEWS = [
 
 // View switcher on the left, search and the add button on the right. The switcher is a segmented control with one
 // sliding pill, so changing views feels like moving a thing instead of swapping two buttons.
-export default function JobsToolbar({ view, onView, query, onQuery, total })
+export default function JobsToolbar({ view, onView, query, onQuery, total, onAdd })
   {
     const activeIndex = VIEWS.findIndex((item) => item.id === view);
 
@@ -47,15 +47,15 @@ export default function JobsToolbar({ view, onView, query, onQuery, total })
               value={query}
               onChange={(event) => onQuery(event.target.value)}
               placeholder="Search company or role"
-              className={`h-9 w-44 rounded-full border border-line bg-surface pr-3 pl-9 text-[13px] text-ink placeholder:text-ink-3 transition-[width,border-color] duration-200 focus:w-60 focus:border-line-strong focus:outline-none sm:w-52 ${focusRing}`}
+              className={`h-9 w-44 rounded-full bg-surface pr-3 pl-9 text-[13px] text-ink placeholder:text-ink-3 transition-[width,background-color] duration-200 focus:w-60 focus:bg-raised focus:outline-none sm:w-52 ${focusRing}`}
             />
           </label>
 
-          <button type="button" className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line-strong text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink ${focusRing}`} aria-label="Filter">
+          <button type="button" className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink ${focusRing}`} aria-label="Filter">
             <FilterIcon size={15} />
           </button>
 
-          <button type="button" className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink pr-4 pl-3 text-[13px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] ${focusRing} focus-visible:outline-ink`}>
+          <button type="button" onClick={onAdd} className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink pr-4 pl-3 text-[13px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] ${focusRing} focus-visible:outline-ink`}>
             <PlusIcon size={15} />
             Add job
           </button>

@@ -181,3 +181,16 @@ export const MailIcon = (props) => (
     <path d="m3 7 9 6 9-6" />
   </Icon>
 );
+
+export const SparkleIcon = (props) => (
+  <Icon {...props}>
+    <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+    <path d="M12 7c0 2.8 2.2 5 5 5-2.8 0-5 2.2-5 5 0-2.8-2.2-5-5-5 2.8 0 5-2.2 5-5z" />
+  </Icon>
+);
+
+export const CheckIcon = (props) => (
+  <Icon {...props}>
+    <path d="m5 12 5 5L20 7" />
+  </Icon>
+);
