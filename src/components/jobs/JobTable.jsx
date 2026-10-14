@@ -1,5 +1,5 @@
 import { statusById, shortDate } from "./statuses.js";
-import { Monogram } from "./JobCard.jsx";
+import CompanyMark from "./CompanyMark.jsx";
 
 const COLUMNS = ["Company", "Role", "Location", "Status", "Applied", "Deadline", "Contact"];
 
@@ -30,7 +30,7 @@ export default function JobTable({ jobs, selectedId, onOpen })
                   >
                     <td className="h-13 px-4 pl-5">
                       <span className="flex items-center gap-2.5">
-                        <Monogram name={job.company} size="h-7 w-7 text-[12px]" />
+                        <CompanyMark job={job} size="h-7 w-7 text-[12px]" />
                         <span className="font-semibold">{job.company}</span>
                       </span>
                     </td>

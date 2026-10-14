@@ -1,13 +1,9 @@
-import { useRef, useState, useLayoutEffect } from "react";
+import { useId, useRef, useState, useLayoutEffect } from "react";
 import { shortDate, daysUntil } from "./statuses.js";
 import { springTo, project, velocityFrom, prefersReducedMotion } from "./spring.js";
-
-// Company monogram until we have logos. The first letter in a raised square reads cleaner than a broken favicon.
-export const Monogram = ({ name, size = "h-8 w-8 text-[13px]" }) => (
-  <span className={`flex shrink-0 items-center justify-center rounded-lg bg-raised font-semibold text-ink ${size}`} aria-hidden="true">
-    {name.charAt(0)}
-  </span>
-);
+import CompanyMark from "./CompanyMark.jsx";
+import { logoFor } from "./logos.js";
+import useLogoTint from "./useLogoTint.js";
 
 // Deadline reads as how many days are left, since that's what you actually act on. Past ones just show the date.
 const deadlineLabel = (iso) =>
@@ -37,6 +33,9 @@ export default function JobCard({ job, selected, fresh, onOpen, onMove, laneAt, 
     const stopSpring = useRef(null);
     const dragged = useRef(false);
     const [lifted, setLifted] = useState(false);
+    const tint = useLogoTint(logoFor(job));
+    // Each card's edge stroke has its own gradient, so the id has to be unique on the page.
+    const edgeId = `edge-${useId().replace(/:/g, "")}`;
 
     const deadline = deadlineLabel(job.deadline);
     const days = daysUntil(job.deadline);
@@ -152,20 +151,37 @@ export default function JobCard({ job, selected, fresh, onOpen, onMove, laneAt, 
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           aria-pressed={selected}
-          className={`job-card group w-full cursor-grab rounded-xl p-3.5 text-left transition-[transform,background-color,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream ${lifted ? "scale-[1.03] cursor-grabbing bg-raised shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]" : "hover:bg-raised active:scale-[0.985]"} ${selected ? "bg-raised" : "bg-surface"}`}
+          style={tint ? { "--tint": tint } : undefined}
+          className={`job-card group w-full cursor-grab rounded-xl p-3.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream ${lifted ? "is-lifted scale-[1.03] cursor-grabbing bg-raised shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]" : "active:scale-[0.985]"} ${selected ? "bg-raised" : "bg-surface"}`}
         >
+          {/* The edge stroke. Drawn by CSS on hover, see .job-card-edge. Brightest at the bottom where it starts. */}
+          <svg className="job-card-edge" aria-hidden="true">
+            <defs>
+              <linearGradient id={edgeId} x1="50%" y1="100%" x2="50%" y2="0%">
+                <stop offset="0%" style={{ stopColor: "rgb(var(--tint))" }} stopOpacity="0.92" />
+                <stop offset="42%" style={{ stopColor: "rgb(var(--tint))" }} stopOpacity="0.72" />
+                <stop offset="100%" style={{ stopColor: "rgb(var(--tint))" }} stopOpacity="0.48" />
+              </linearGradient>
+            </defs>
+            <g>
+              <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="11" ry="11" fill="none" stroke={`url(#${edgeId})`} strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+            </g>
+          </svg>
+
           <div className="flex items-center gap-2.5">
-            <Monogram name={job.company} />
+            <CompanyMark job={job} />
             <span className={`truncate text-[13px] font-semibold transition-colors duration-150 ${selected ? "text-cream" : ""}`}>{job.company}</span>
           </div>
 
+          {/* The small grey lines are "card-meta": on hover they turn a pale version of the brand colour rather than
+              staying grey against it, see .card-meta in index.css. The role stays white. */}
           <p className="mt-2.5 text-[13px] leading-snug text-ink">{job.role}</p>
-          <p className="mt-1 text-[12px] text-ink-3">{job.location}</p>
+          <p className="card-meta mt-1 text-[12px] text-ink-3">{job.location}</p>
 
           {(job.applied || deadline) && (
             <div className="mt-3 flex items-center justify-between gap-2 text-[11px] tabular-nums">
-              <span className="text-ink-3">{job.applied ? `Applied ${shortDate(job.applied)}` : "Not applied"}</span>
-              {deadline && <span className={urgent ? "font-medium text-cream" : "text-ink-3"}>{deadline}</span>}
+              <span className="card-meta text-ink-3">{job.applied ? `Applied ${shortDate(job.applied)}` : "Not applied"}</span>
+              {deadline && <span className={urgent ? "card-urgent font-medium text-cream" : "card-meta text-ink-3"}>{deadline}</span>}
             </div>
           )}
         </button>

@@ -1,3 +1,5 @@
+import { faviconUrl, rootDomain, slugOf } from "../components/jobs/logos.js";
+
 // Scaffold stubs — no live requests yet. Hook these up to http.js when ready.
 
 export const getHealth = async () =>
@@ -42,7 +44,12 @@ const guessFromUrl = (url) =>
     const slug = wordy.sort((a, b) => b.length - a.length)[0] || "";
     const role = titleCase(slug.replace(/\b[0-9a-f]{6,}\b/gi, "").replace(/-\d+$/, ""));
 
-    return { company, role, location: "", link: `${host}${parsed.pathname}`.replace(/\/$/, "") };
+    // The logo comes from the employer's own site when the link is on it, otherwise from a .com guess off the name.
+    // The add sheet shows it as a suggestion, so a wrong guess costs one click to swap.
+    const ownSite = Boolean(company) && !(host in BOARD_HOSTS) && !AGGREGATORS.some((site) => host.endsWith(site));
+    const logo = ownSite ? faviconUrl(rootDomain(host)) : company ? faviconUrl(`${slugOf(company)}.com`) : "";
+
+    return { company, role, location: "", logo, link: `${host}${parsed.pathname}`.replace(/\/$/, "") };
   };
 
 // Reads a job posting from its link. Today it's a local guess with a pause so the UI can show the reading state;

@@ -26,6 +26,10 @@
 
       /* A stronger ease-out than the browser's. Arrives fast, lands soft. */
       --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+      /* Fast start, long settle. The card hug runs on this. */
+      --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+      /* Gentle both ways, for the lift. */
+      --ease-soft: cubic-bezier(0.45, 0, 0.55, 1);
    }
 
 :root
@@ -72,6 +76,174 @@ body
          {
             touch-action: none;
          }
+   }
+
+/* Card hover, the "hug" from NextStep. The card carries its company's colour in --tint (an r g b triple read off
+   the logo, cream when there isn't one). At rest it's plain surface, no stroke. Hovered, four things happen on the
+   same fast-start-long-settle curve: the card lifts 3px, brand light rises from the bottom edge, a second glow
+   blooms toward the logo, and a stroke in the brand colour draws itself around the edge starting at the bottom.
+   Leaving runs it all backwards. The fill takes a fifth of the colour too, so the whole card reads as the brand
+   and not just its edges. */
+.job-card
+   {
+      --tint: 219 216 206;
+      --hug: 1180ms;
+      position: relative;
+      isolation: isolate;
+      transition: translate 450ms var(--ease-soft), scale 150ms var(--ease-out-strong), background-color 900ms var(--ease-premium);
+   }
+
+.job-card::before,
+.job-card::after
+   {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--hug) var(--ease-premium), transform var(--hug) var(--ease-premium);
+   }
+
+/* Light from the bottom. Masked by the full card so it has no flat top edge. */
+.job-card::before
+   {
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(78% 95% at 50% 100%, rgb(var(--tint) / 0.42) 0%, rgb(var(--tint) / 0.2) 46%, rgb(var(--tint) / 0.1) 62%, transparent 78%);
+      transform: scaleY(0.5);
+      transform-origin: 50% 100%;
+   }
+
+/* Toward the logo. Top-left corner rounded so the patch isn't a sharp rectangle. */
+.job-card::after
+   {
+      top: 0;
+      left: 0;
+      width: 62%;
+      height: 46%;
+      border-top-left-radius: inherit;
+      background: radial-gradient(ellipse 95% 88% at 12% 8%, rgb(var(--tint) / 0.36) 0%, rgb(var(--tint) / 0.14) 36%, transparent 70%);
+      transform: scale(0.86);
+      transition-duration: calc(var(--hug) * 0.92);
+      transition-delay: 90ms;
+   }
+
+/* The stroke. pathLength 1 makes the dash maths unit-free; offset 1 is fully hidden, 0 fully drawn. The group is
+   turned 180° so the draw starts at the bottom and sweeps up toward the logo. */
+.job-card-edge
+   {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+      transition: filter var(--hug) var(--ease-premium);
+   }
+
+.job-card-edge g
+   {
+      transform: rotate(180deg);
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+   }
+
+.job-card-edge rect
+   {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset var(--hug) var(--ease-premium);
+   }
+
+.job-card .company-mark
+   {
+      transition: background-color 300ms ease;
+   }
+
+/* Grey text fights a coloured card, so while the card is lit the small lines go to a pale cut of the same colour:
+   same hue as the light, nearly white, so they sit inside the tint instead of on top of it. The role and company
+   stay white, and an urgent deadline goes to full white so it still leads. */
+.job-card
+   {
+      --tint-pale: color-mix(in oklab, #ffffff 78%, rgb(var(--tint)));
+   }
+
+.job-card .card-meta,
+.job-card .card-urgent
+   {
+      transition: color 600ms var(--ease-premium);
+   }
+
+@media (hover: hover) and (pointer: fine)
+   {
+      .job-card:hover
+         {
+            translate: 0 -3px;
+            background-color: color-mix(in oklab, var(--color-surface) 80%, rgb(var(--tint)));
+            transition-duration: 450ms, 150ms, 600ms;
+         }
+
+      .job-card:hover::before
+         {
+            opacity: 1;
+            transform: scaleY(1);
+         }
+
+      .job-card:hover::after
+         {
+            opacity: 1;
+            transform: scale(1);
+         }
+
+      .job-card:hover .job-card-edge
+         {
+            filter: drop-shadow(0 0 20px rgb(var(--tint) / 0.35));
+         }
+
+      .job-card:hover .job-card-edge rect
+         {
+            stroke-dashoffset: 0;
+         }
+
+      /* Only the letter tile has a fill to tint; a real logo sits bare on the card. */
+      .job-card:hover .company-mark[data-fallback]
+         {
+            background-color: color-mix(in oklab, var(--color-raised) 45%, rgb(var(--tint)));
+         }
+
+      .job-card:hover .card-meta
+         {
+            color: var(--tint-pale);
+         }
+
+      .job-card:hover .card-urgent
+         {
+            color: var(--color-ink);
+         }
+   }
+
+/* Dragging shows the full hug without waiting on a hover. */
+.job-card.is-lifted::before
+   {
+      opacity: 1;
+      transform: scaleY(1);
+   }
+
+.job-card.is-lifted::after
+   {
+      opacity: 1;
+      transform: scale(1);
+   }
+
+.job-card.is-lifted .job-card-edge rect
+   {
+      stroke-dashoffset: 0;
+   }
+
+.job-card.is-lifted .card-meta
+   {
+      color: var(--tint-pale);
    }
 
 /* The add-job sheet's contents arrive in a short cascade after the sheet itself, each block a beat after the

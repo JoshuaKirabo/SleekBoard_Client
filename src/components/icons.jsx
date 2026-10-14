@@ -194,3 +194,18 @@ export const CheckIcon = (props) => (
     <path d="m5 12 5 5L20 7" />
   </Icon>
 );
+
+export const UploadIcon = (props) => (
+  <Icon {...props}>
+    <path d="M12 16V4M7 9l5-5 5 5" />
+    <path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" />
+  </Icon>
+);
+
+export const ImageIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="4" width="18" height="16" rx="2.5" />
+    <circle cx="9" cy="10" r="1.6" />
+    <path d="m21 16-5-5-9 9" />
+  </Icon>
+);

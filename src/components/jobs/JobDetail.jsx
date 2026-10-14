@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { STATUSES, longDate } from "./statuses.js";
-import { Monogram } from "./JobCard.jsx";
+import CompanyMark from "./CompanyMark.jsx";
 import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon } from "../icons.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
@@ -31,7 +31,7 @@ export default function JobDetail({ job, onClose, onStatus })
       <aside
         aria-label="Application details"
         aria-hidden={!open}
-        className={`fixed inset-y-0 right-0 z-30 flex w-full flex-col bg-surface/90 shadow-[-32px_0_64px_-32px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:w-[460px] ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed inset-y-0 right-0 z-30 flex w-full flex-col bg-surface/90 shadow-[-32px_0_64px_-32px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:w-[560px] lg:w-[700px] ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {job && (
           <>
@@ -46,9 +46,14 @@ export default function JobDetail({ job, onClose, onStatus })
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 pb-8">
-              <Monogram name={job.company} size="h-12 w-12 text-[20px]" />
-              <h2 className="mt-4 text-[22px] leading-tight font-semibold tracking-tight">{job.company}</h2>
-              <p className="mt-1 text-[14px] text-ink-2">{job.role}</p>
+              {/* Logo on the left, name and role stacked beside it, like the card but at panel size. */}
+              <div className="flex items-center gap-4">
+                <CompanyMark job={job} size="h-14 w-14 text-[22px]" radius="rounded-xl" />
+                <div className="min-w-0">
+                  <h2 className="truncate text-[22px] leading-tight font-semibold tracking-tight">{job.company}</h2>
+                  <p className="mt-1 truncate text-[14px] text-ink-2">{job.role}</p>
+                </div>
+              </div>
 
               {/* The status row is the one control on the panel. Picking a lane here moves the card behind it. */}
               <div className="mt-6 flex flex-wrap gap-1.5" role="radiogroup" aria-label="Status">
