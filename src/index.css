@@ -1,14 +1,49 @@
 @import "tailwindcss";
 
+/* Brand colours from the logo deck: Sleek Gray, Whitespace, Board Blue, Cream Team.
+   The warm greys for secondary text are cream pulled down so nothing reads as blue-grey. */
+@theme
+   {
+      --font-sans: "Google Sans", "Google Sans Flex", "Product Sans", ui-sans-serif, system-ui, sans-serif;
+
+      --color-canvas: #171717;
+      --color-surface: #232323;
+      --color-raised: #2c2c2c;
+      --color-line: rgba(255, 255, 255, 0.07);
+      --color-line-strong: rgba(255, 255, 255, 0.14);
+
+      --color-ink: #ffffff;
+      --color-ink-2: #a8a59e;
+      --color-ink-3: #8f8c85;
+
+      --color-board: #1c2a33;
+      --color-board-deep: #121c23;
+      --color-board-light: #2b4150;
+
+      --color-cream: #dbd8ce;
+      --color-stone: #8a8679;
+   }
+
 :root
    {
-      color-scheme: light dark;
+      color-scheme: dark;
    }
 
 body
    {
       margin: 0;
       min-height: 100vh;
-      font-family: ui-sans-serif, system-ui, sans-serif;
+      background: var(--color-canvas);
+      color: var(--color-ink);
+      font-family: var(--font-sans);
       -webkit-font-smoothing: antialiased;
+   }
+
+@media (prefers-reduced-motion: reduce)
+   {
+      *
+         {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+         }
    }

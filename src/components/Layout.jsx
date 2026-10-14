@@ -1,22 +1,34 @@
-import { Link, Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import Sidebar from "./Sidebar.jsx";
+import Header from "./Header.jsx";
 
+// Header title per route. Unknown routes land on the 404 page, so they get that title.
+const TITLES =
+  {
+    "/": "Analytics",
+    "/dashboard": "Dashboard",
+    "/chat": "Chat",
+    "/resume": "Resume",
+    "/jobs": "Jobs",
+    "/application": "Application",
+  };
+
+// Sidebar on the left, header across the top, and whichever page is open fills the rest.
 export default function Layout()
   {
+    const { pathname } = useLocation();
+    const title = TITLES[pathname] || "Not found";
+
     return (
-      <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-        <header className="border-b border-gray-200 dark:border-gray-800">
-          <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-            <Link to="/" className="text-lg font-semibold tracking-tight">SleekBoard</Link>
-          </nav>
-        </header>
+      <div className="flex min-h-dvh flex-col bg-canvas text-ink lg:flex-row">
+        <Sidebar />
 
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
-          <Outlet />
-        </main>
-
-        <footer className="border-t border-gray-200 px-6 py-4 text-center text-sm text-gray-500 dark:border-gray-800">
-          SleekBoard
-        </footer>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Header title={title} />
+          <main className="flex flex-1 flex-col p-5 sm:p-7">
+            <Outlet />
+          </main>
+        </div>
       </div>
     );
   }

@@ -1,4 +1,6 @@
-import http from "./http.js";
+// Scaffold stubs — no live requests yet. Hook these up to http.js when ready.
 
-// Each api call is a tiny function here so pages never build URLs themselves.
-export const getHealth = () => http.get("/health");
+export const getHealth = async () =>
+  {
+    throw new Error("Not wired: getHealth");
+  };
