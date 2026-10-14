@@ -19,6 +19,7 @@
       --color-board: #1c2a33;
       --color-board-deep: #121c23;
       --color-board-light: #2b4150;
+      --color-board-bright: #7a9fb6;
 
       --color-cream: #dbd8ce;
       --color-stone: #8a8679;
@@ -45,5 +46,27 @@ body
          {
             transition-duration: 0.01ms !important;
             animation-duration: 0.01ms !important;
+         }
+   }
+
+/* The jobs board scrolls sideways on small screens. Hiding the bar keeps the lanes clean, the snap keeps a lane in frame. */
+.lanes
+   {
+      scrollbar-width: none;
+      scroll-snap-type: x proximity;
+   }
+
+.lanes::-webkit-scrollbar
+   {
+      display: none;
+   }
+
+/* With a mouse or pen the card follows the pointer, so the browser must not try to pan instead. On touch the
+   board keeps scrolling and the card ignores the gesture, see JobCard. */
+@media (pointer: fine)
+   {
+      .job-card
+         {
+            touch-action: none;
          }
    }

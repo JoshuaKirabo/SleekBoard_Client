@@ -99,3 +99,85 @@ export const ArrowUpRightIcon = (props) => (
     <path d="M7 17 17 7" />
   </Icon>
 );
+
+export const SearchIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </Icon>
+);
+
+export const PlusIcon = (props) => (
+  <Icon {...props}>
+    <path d="M12 5v14" />
+    <path d="M5 12h14" />
+  </Icon>
+);
+
+export const CloseIcon = (props) => (
+  <Icon {...props}>
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </Icon>
+);
+
+export const BoardIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="4" width="5" height="16" rx="1.5" />
+    <rect x="10" y="4" width="5" height="10" rx="1.5" />
+    <rect x="17" y="4" width="4" height="13" rx="1.5" />
+  </Icon>
+);
+
+export const TableIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M3 10h18" />
+    <path d="M3 15h18" />
+    <path d="M10 10v10" />
+  </Icon>
+);
+
+export const FilterIcon = (props) => (
+  <Icon {...props}>
+    <path d="M4 6h16" />
+    <path d="M7 12h10" />
+    <path d="M10 18h4" />
+  </Icon>
+);
+
+export const PinIcon = (props) => (
+  <Icon {...props}>
+    <path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11z" />
+    <circle cx="12" cy="10" r="2.2" />
+  </Icon>
+);
+
+export const CalendarIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="5" width="18" height="16" rx="2.5" />
+    <path d="M3 10h18" />
+    <path d="M8 3v4M16 3v4" />
+  </Icon>
+);
+
+export const LinkIcon = (props) => (
+  <Icon {...props}>
+    <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5" />
+    <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19.5" />
+  </Icon>
+);
+
+export const PersonIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </Icon>
+);
+
+export const MailIcon = (props) => (
+  <Icon {...props}>
+    <rect x="3" y="5" width="18" height="14" rx="2.5" />
+    <path d="m3 7 9 6 9-6" />
+  </Icon>
+);
