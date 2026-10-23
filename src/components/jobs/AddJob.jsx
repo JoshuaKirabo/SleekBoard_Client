@@ -35,9 +35,8 @@ const Field = ({ label, filled, stamp, className = "", children }) => (
   </label>
 );
 
-// The add flow leads with the link. Paste one, the reader fills what it can, and the rest of the form is there for
-// what it missed or for roles you only heard about. Today the reader is a local guess; the server takes it over
-// without this file changing, see extractJob.
+// The add flow leads with the link. Paste one, press Fill in, and the reader fills what it can. The rest is there for
+// what it missed or for roles you only heard about. The server reads the page; see extractJob for the fallback.
 export default function AddJob({ open, onClose, onAdd })
   {
     const [draft, setDraft] = useState(EMPTY);
@@ -88,7 +87,7 @@ export default function AddJob({ open, onClose, onAdd })
         setNote({ tone: "quiet", text: "Reading the listing…" });
         try
           {
-            const found = await extractJob(url);
+            const { via, reason, ...found } = await extractJob(url);
             if(id !== request.current) return;
             const keys = Object.keys(found).filter((key) => found[key] && key !== "link");
             // A logo you picked yourself outranks the reader's guess.
@@ -101,7 +100,11 @@ export default function AddJob({ open, onClose, onAdd })
               }
             setFilled(keepLogo ? keys.filter((key) => key !== "logo") : keys);
             setStamp(id);
-            setNote(keys.length ? { tone: "ok", text: `Filled from ${found.link.split("/")[0]}. Check it over.` } : { tone: "quiet", text: "Couldn't tell much from that link. Fill it in by hand." });
+            // Say whether we read the page or only guessed from the link, so you know how far to trust it.
+            const host = found.link.split("/")[0];
+            if(!keys.length) setNote({ tone: "quiet", text: "Couldn't tell much from that link. Fill it in by hand." });
+            else if(via === "page") setNote({ tone: "ok", text: `Read the listing on ${host}. Check it over.` });
+            else setNote({ tone: "quiet", text: `${reason} Guessed what we could from the link.` });
           }
         catch(error)
           {
@@ -114,16 +117,8 @@ export default function AddJob({ open, onClose, onAdd })
           }
       };
 
-    // Pasting a link is the whole point, so it reads straight away without a second click.
-    const onPaste = (event) =>
-      {
-        const text = event.clipboardData.getData("text").trim();
-        if(!/^(https?:\/\/)?[\w.-]+\.[a-z]{2,}/i.test(text)) return;
-        event.preventDefault();
-        setDraft((current) => ({ ...current, link: text }));
-        read(text);
-      };
-
+    // Reading only runs when you ask: the Fill in button, or Enter in the link box. Every read sends the server off to
+    // open someone else's page, so a paste (or a paste you then fix) shouldn't fire one by itself.
     const onLinkKey = (event) =>
       {
         if(event.key !== "Enter") return;
@@ -247,7 +242,6 @@ export default function AddJob({ open, onClose, onAdd })
                 type="url"
                 value={draft.link}
                 onChange={set("link")}
-                onPaste={onPaste}
                 onKeyDown={onLinkKey}
                 placeholder="Paste the job link"
                 autoComplete="off"
@@ -352,7 +346,7 @@ export default function AddJob({ open, onClose, onAdd })
               <Field label="Location" filled={filled.includes("location")} stamp={stamp}>
                 <input type="text" value={draft.location} onChange={set("location")} placeholder="Remote" className={smallWell} />
               </Field>
-              <Field label="Deadline">
+              <Field label="Deadline" filled={filled.includes("deadline")} stamp={stamp}>
                 <input type="date" value={draft.deadline} onChange={set("deadline")} className={`${smallWell} tabular-nums`} />
               </Field>
               <Field label="Contact">
