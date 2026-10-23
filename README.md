@@ -10,7 +10,9 @@ npm install
 npm run dev
 ```
 
-Vite serves on http://localhost:5173. `VITE_API_URL` points at the API, the analytics dashboard on the home page runs on sample data until the API endpoints exist.
+Vite serves on http://localhost:5173. `VITE_API_URL` points at the API: use `http://127.0.0.1:5050/api`, not
+`localhost`. The server only listens on 127.0.0.1, and `localhost` can resolve to `::1` first, so another app on
+`[::1]:5050` would quietly answer the board's requests. The analytics dashboard on the home page runs on sample data until the API endpoints exist.
 
 ## Layout
 
