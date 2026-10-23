@@ -130,14 +130,16 @@ body
    }
 
 /* The stroke. pathLength 1 makes the dash maths unit-free; offset 1 is fully hidden, 0 fully drawn. The group is
-   turned 180° so the draw starts at the bottom and sweeps up toward the logo. */
+   turned 180° so the draw starts at the bottom and sweeps up toward the logo. The 1px inset lives here on the box,
+   not as calc() on the rect: Safari won't take calc() in an SVG attribute. overflow stays visible so the stroke's
+   outer half isn't clipped. */
 .job-card-edge
    {
       position: absolute;
-      inset: 0;
+      inset: 1px;
       z-index: 1;
-      width: 100%;
-      height: 100%;
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
       overflow: visible;
       pointer-events: none;
       transition: filter var(--hug) var(--ease-premium);

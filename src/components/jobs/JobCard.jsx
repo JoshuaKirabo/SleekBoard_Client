@@ -248,7 +248,7 @@ export default function JobCard({ job, selected, fresh, still = false, onOpen, o
               </linearGradient>
             </defs>
             <g>
-              <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="11" ry="11" fill="none" stroke={`url(#${edgeId})`} strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+              <rect width="100%" height="100%" rx="11" ry="11" fill="none" stroke={`url(#${edgeId})`} strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
             </g>
           </svg>
 
