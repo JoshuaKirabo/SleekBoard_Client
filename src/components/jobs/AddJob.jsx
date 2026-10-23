@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { STATUSES } from "./statuses.js";
+import StatusSelect from "./StatusSelect.jsx";
 import { extractJob } from "../../services/api.js";
 import { findLogos, readLogoFile, domainOfLogo } from "./logos.js";
 import CompanyMark from "./CompanyMark.jsx";
@@ -18,7 +18,7 @@ const EMPTY = { company: "", role: "", location: "", status: "saved", applied: "
 // The finder is closed and empty until you ask for it.
 const NO_FINDER = { open: false, query: "", results: [], searching: false, searched: false };
 
-// Small pill for the logo actions. Same shape as the status chips so the row reads as one family.
+// Small pill for the logo actions.
 const chip = `flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-canvas px-3 text-[12.5px] font-medium text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink active:bg-raised disabled:cursor-default disabled:opacity-40 ${focusRing}`;
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -363,36 +363,21 @@ export default function AddJob({ open, onClose, onAdd })
               </Field>
             </div>
 
-            <div className={`mt-6 ${rise}`} style={{ "--i": 5 }} role="radiogroup" aria-label="Status">
-              <span className="mb-2 block text-[12px] font-medium text-ink-3">Status</span>
-              <div className="flex flex-wrap gap-1">
-                {STATUSES.map((status) => {
-                  const active = status.id === draft.status;
-                  return (
-                    <button
-                      key={status.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      onClick={() => setDraft((current) => ({ ...current, status: status.id }))}
-                      className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-2.5 text-[12.5px] font-medium transition-colors duration-150 ${focusRing} ${active ? "bg-ink text-canvas" : "bg-canvas text-ink-2 hover:bg-raised hover:text-ink active:bg-raised"}`}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-canvas" : status.dot}`} aria-hidden="true" />
-                      {status.label}
-                    </button>
-                  );
-                })}
+            {/* Status is a dropdown in the same grid. Once it leaves "To Apply" the applied date opens up beside it. */}
+            <div className={`mt-5 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 ${rise}`} style={{ "--i": 5 }}>
+              <div>
+                <span className="mb-1.5 block text-[12px] font-medium text-ink-3">Status</span>
+                <StatusSelect value={draft.status} onChange={(status) => setDraft((current) => ({ ...current, status }))} />
               </div>
+              {draft.status !== "saved" && (
+                <div>
+                  <Field label="Applied on">
+                    <input type="date" value={draft.applied} onChange={set("applied")} className={`${smallWell} tabular-nums`} />
+                  </Field>
+                  <p className="mt-1.5 text-[12px] text-ink-3">Leave it blank for today.</p>
+                </div>
+              )}
             </div>
-
-            {draft.status !== "saved" && (
-              <div className="mt-5 sm:w-[calc(50%-8px)]">
-                <Field label="Applied on">
-                  <input type="date" value={draft.applied} onChange={set("applied")} className={`${smallWell} tabular-nums`} />
-                </Field>
-                <p className="mt-1.5 text-[12px] text-ink-3">Leave it blank for today.</p>
-              </div>
-            )}
 
             <div className={`mt-6 ${rise}`} style={{ "--i": 6 }}>
               <Field label="Notes">

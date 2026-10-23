@@ -24,6 +24,10 @@
       --color-cream: #dbd8ce;
       --color-stone: #8a8679;
 
+      /* The two outcomes. Sage and brick rather than traffic-light green and red, so they sit with the warm greys. */
+      --color-go: #9bc4a3;
+      --color-halt: #c9867b;
+
       /* A stronger ease-out than the browser's. Arrives fast, lands soft. */
       --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
       /* Fast start, long settle. The card hug runs on this. */
@@ -56,16 +60,13 @@ body
          }
    }
 
-/* The jobs board scrolls sideways on small screens. Hiding the bar keeps the lanes clean, the snap keeps a lane in frame. */
-.lanes
+/* A lane that outgrows its share of the board scrolls inside itself. The bar is thin and nearly the canvas colour so
+   it says "there's more" without drawing a line down the lane. Overscroll stays in the lane instead of bouncing the page. */
+.lane-scroll
    {
-      scrollbar-width: none;
-      scroll-snap-type: x proximity;
-   }
-
-.lanes::-webkit-scrollbar
-   {
-      display: none;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+      overscroll-behavior: contain;
    }
 
 /* With a mouse or pen the card follows the pointer, so the browser must not try to pan instead. On touch the
@@ -80,8 +81,8 @@ body
 
 /* Card hover, the "hug" from NextStep. The card carries its company's colour in --tint (an r g b triple read off
    the logo, cream when there isn't one). At rest it's plain surface, no stroke. Hovered, four things happen on the
-   same fast-start-long-settle curve: the card lifts 3px, brand light rises from the bottom edge, a second glow
-   blooms toward the logo, and a stroke in the brand colour draws itself around the edge starting at the bottom.
+   same fast-start-long-settle curve: brand light rises from the bottom edge, a second glow blooms toward the logo,
+   and a stroke in the brand colour draws itself around the edge starting at the bottom. The card itself stays put.
    Leaving runs it all backwards. The fill takes a fifth of the colour too, so the whole card reads as the brand
    and not just its edges. */
 .job-card
@@ -90,7 +91,7 @@ body
       --hug: 1180ms;
       position: relative;
       isolation: isolate;
-      transition: translate 450ms var(--ease-soft), scale 150ms var(--ease-out-strong), background-color 900ms var(--ease-premium);
+      transition: scale 150ms var(--ease-out-strong), background-color 900ms var(--ease-premium);
    }
 
 .job-card::before,
@@ -179,9 +180,8 @@ body
    {
       .job-card:hover
          {
-            translate: 0 -3px;
             background-color: color-mix(in oklab, var(--color-surface) 80%, rgb(var(--tint)));
-            transition-duration: 450ms, 150ms, 600ms;
+            transition-duration: 150ms, 600ms;
          }
 
       .job-card:hover::before
@@ -246,8 +246,19 @@ body
       color: var(--tint-pale);
    }
 
+/* Held over the Ghosted chip, the lifted card shrinks toward the pointer and dims a touch, so it reads as going into
+   the chip and the chip underneath shows. Moving off the chip grows it straight back. */
+[data-tucking] .job-card.is-lifted
+   {
+      scale: 0.42;
+      opacity: 0.85;
+      transition: scale 220ms var(--ease-out-strong), opacity 220ms var(--ease-out-strong), background-color 900ms var(--ease-premium);
+   }
+
 /* The add-job sheet's contents arrive in a short cascade after the sheet itself, each block a beat after the
-   one above it. Only runs on open; the class is dropped when the sheet closes so the next open starts fresh. */
+   one above it. Only runs on open; the class is dropped when the sheet closes so the next open starts fresh.
+   Fill is backwards only so the transform lets go once a block lands, otherwise each block would stay its own
+   stacking layer and the status menu would slide under the notes well below it. */
 @keyframes rise
    {
       from
@@ -264,7 +275,7 @@ body
 
 .rise
    {
-      animation: rise 480ms var(--ease-out-strong) both;
+      animation: rise 480ms var(--ease-out-strong) backwards;
       animation-delay: calc(90ms + var(--i, 0) * 40ms);
    }
 
@@ -275,8 +286,32 @@ body
       animation: rise 420ms var(--ease-out-strong) backwards;
    }
 
+/* The Ghosted chip's count when a card is dropped on it. One quick hop up and back, so the drop has somewhere to
+   land you can see even though the drawer stays shut. */
+@keyframes count-hop
+   {
+      0%
+         {
+            transform: translateY(0) scale(1);
+         }
+      40%
+         {
+            transform: translateY(-3px) scale(1.18);
+         }
+      100%
+         {
+            transform: translateY(0) scale(1);
+         }
+   }
+
+.count-hop
+   {
+      animation: count-hop 360ms var(--ease-out-strong);
+   }
+
 @media (prefers-reduced-motion: reduce)
    {
+      .count-hop,
       .rise,
       .card-rise
          {

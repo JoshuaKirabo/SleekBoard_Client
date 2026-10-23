@@ -1,16 +1,21 @@
-// The six lanes, in the order an application actually moves through them. The dot colour comes from the
-// brand scale instead of a rainbow of tints: muted while it is still to apply, Board Blue once sent, cream in the room,
-// white when the offer lands, faded once rejected, and just an outline when they went quiet on you.
+// The six lanes, in the order an application actually moves through them. Each lane's rail carries its own colour:
+// stone while it is still to apply, Board Blue once sent, cream in the room, sage when the offer lands, brick once
+// rejected, and a dim grey when they went quiet on you.
 export const STATUSES = [
-  { id: "saved", label: "To Apply", dot: "bg-ink-3", rail: "bg-ink-3", empty: "Save a role you want to apply to." },
-  { id: "applied", label: "Applied", dot: "bg-board-bright", rail: "bg-board-bright", empty: "Nothing sent yet." },
-  { id: "interviewing", label: "Interviewing", dot: "bg-cream", rail: "bg-cream", empty: "No interviews on the calendar." },
-  { id: "offer", label: "Offer", dot: "bg-ink", rail: "bg-ink", empty: "No offers yet. Keep going." },
-  { id: "rejected", label: "Rejected", dot: "bg-stone/50", rail: "bg-stone/40", empty: "Nothing rejected." },
-  { id: "ghosted", label: "Ghosted", dot: "border border-ink-3 bg-transparent", rail: "bg-ink-3/30", empty: "No one has gone quiet on you." },
+  { id: "saved", label: "To Apply", rail: "bg-stone", empty: "Save a role you want to apply to." },
+  { id: "applied", label: "Applied", rail: "bg-board-bright", empty: "Nothing sent yet." },
+  { id: "interviewing", label: "Interviewing", rail: "bg-cream", empty: "No interviews on the calendar." },
+  { id: "offer", label: "Offer", rail: "bg-go", empty: "No offers yet. Keep going." },
+  { id: "rejected", label: "Rejected", rail: "bg-halt", empty: "Nothing rejected." },
+  { id: "ghosted", label: "Ghosted", rail: "bg-ink-3/50", empty: "No one has gone quiet on you." },
 ];
 
 export const statusById = (id) => STATUSES.find((status) => status.id === id);
+
+// Ghosted is out of the pipeline, so it isn't a lane. It lives in a drawer opened from the toolbar, and the board
+// gives its space to the five lanes that are still moving.
+export const DRAWER_ID = "ghosted";
+export const BOARD_LANES = STATUSES.filter((status) => status.id !== DRAWER_ID);
 
 // "15 Oct" style so the cards stay narrow.
 export const shortDate = (iso) =>

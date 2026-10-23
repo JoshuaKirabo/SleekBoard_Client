@@ -13,19 +13,24 @@ const TITLES =
     "/application": "Application",
   };
 
+// Pages that are held to the height of the window instead of growing past it. The jobs board is one: the whole
+// pipeline should be in view at once, and a long lane scrolls inside itself rather than pushing the page down.
+const FIT_TO_WINDOW = new Set(["/jobs"]);
+
 // Sidebar on the left, header across the top, and whichever page is open fills the rest.
 export default function Layout()
   {
     const { pathname } = useLocation();
     const title = TITLES[pathname] || "Not found";
+    const fit = FIT_TO_WINDOW.has(pathname);
 
     return (
-      <div className="flex min-h-dvh flex-col bg-canvas text-ink lg:flex-row">
+      <div className={`flex flex-col bg-canvas text-ink lg:flex-row ${fit ? "h-dvh overflow-hidden" : "min-h-dvh"}`}>
         <Sidebar />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <Header title={title} />
-          <main className="flex flex-1 flex-col p-5 sm:p-7">
+          <main className="flex min-h-0 flex-1 flex-col p-5 sm:p-7">
             <Outlet />
           </main>
         </div>

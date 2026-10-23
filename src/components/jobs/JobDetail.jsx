@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { STATUSES, longDate } from "./statuses.js";
+import { longDate } from "./statuses.js";
+import StatusSelect from "./StatusSelect.jsx";
 import CompanyMark from "./CompanyMark.jsx";
 import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon } from "../icons.jsx";
 
@@ -31,7 +32,7 @@ export default function JobDetail({ job, onClose, onStatus })
       <aside
         aria-label="Application details"
         aria-hidden={!open}
-        className={`fixed inset-y-0 right-0 z-30 flex w-full flex-col bg-surface/90 shadow-[-32px_0_64px_-32px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:w-[560px] lg:w-[700px] ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed inset-y-0 right-0 z-30 flex w-full flex-col bg-surface/90 backdrop-blur-xl transition-[translate,box-shadow] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:w-[560px] lg:w-[700px] ${open ? "translate-x-0 shadow-[-32px_0_64px_-32px_rgba(0,0,0,0.7)]" : "translate-x-full shadow-none"}`}
       >
         {job && (
           <>
@@ -56,23 +57,9 @@ export default function JobDetail({ job, onClose, onStatus })
               </div>
 
               {/* The status row is the one control on the panel. Picking a lane here moves the card behind it. */}
-              <div className="mt-6 flex flex-wrap gap-1.5" role="radiogroup" aria-label="Status">
-                {STATUSES.map((status) => {
-                  const active = status.id === job.status;
-                  return (
-                    <button
-                      key={status.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      onClick={() => onStatus(job.id, status.id)}
-                      className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium transition-colors duration-150 ${focusRing} ${active ? "bg-ink text-canvas" : "bg-raised/70 text-ink-2 hover:bg-raised hover:text-ink"}`}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-canvas" : status.dot}`} aria-hidden="true" />
-                      {status.label}
-                    </button>
-                  );
-                })}
+              <div className="mt-6 flex items-center gap-3">
+                <span className="text-[12px] text-ink-3">Status</span>
+                <StatusSelect look="pill" value={job.status} onChange={(status) => onStatus(job.id, status)} />
               </div>
 
               <dl className="mt-7 flex flex-col gap-1">

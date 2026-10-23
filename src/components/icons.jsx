@@ -209,3 +209,11 @@ export const ImageIcon = (props) => (
     <path d="m21 16-5-5-9 9" />
   </Icon>
 );
+
+// The ghost for the Ghosted drawer. Round head, wavy hem, two dots for eyes.
+export const GhostIcon = (props) => (
+  <Icon {...props}>
+    <path d="M5 21V10a7 7 0 0 1 14 0v11l-2.33-1.75L14.33 21 12 19.25 9.67 21l-2.34-1.75z" />
+    <path d="M9.5 10.5h.01M14.5 10.5h.01" strokeWidth="2.4" />
+  </Icon>
+);
