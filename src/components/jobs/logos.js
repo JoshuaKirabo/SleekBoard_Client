@@ -5,6 +5,9 @@
 const FAVICON = "https://www.google.com/s2/favicons";
 const SIZE = 128;
 
+// The most an uploaded logo can be once it's a data URL. Must match the logo maxlength in the server's job model.
+const MAX_LOGO = 200000;
+
 // Smaller than this and it's the fallback globe, not a logo.
 const MIN_REAL = 24;
 
@@ -85,11 +88,19 @@ export const readLogoFile = (file) =>
   new Promise((resolve, reject) =>
     {
       if(!file.type.startsWith("image/")) return reject(new Error("That isn't an image."));
+
+      // Turned away here, before it reaches the server, with a message the user can act on.
+      const done = (logo) =>
+        {
+          if(logo.length > MAX_LOGO) return reject(new Error(`That logo is too big. Keep it under ${Math.floor(MAX_LOGO / 1000 * 0.75)}KB.`));
+          resolve(logo);
+        };
+
       const reader = new FileReader();
       reader.onerror = () => reject(new Error("Couldn't read that file."));
       reader.onload = () =>
         {
-          if(file.type === "image/svg+xml") return resolve(reader.result);
+          if(file.type === "image/svg+xml") return done(reader.result);
           const image = new Image();
           image.onerror = () => reject(new Error("Couldn't read that image."));
           image.onload = () =>
@@ -103,7 +114,7 @@ export const readLogoFile = (file) =>
               const width = image.width * scale;
               const height = image.height * scale;
               context.drawImage(image, (SIZE - width) / 2, (SIZE - height) / 2, width, height);
-              resolve(canvas.toDataURL("image/png"));
+              done(canvas.toDataURL("image/png"));
             };
           image.src = reader.result;
         };
