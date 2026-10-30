@@ -72,11 +72,11 @@ function Decided({ decision, pending })
           </p>
         );
       }
-    return <p className="mt-4 flex h-8 items-center text-[12.5px] text-ink-3">Passed on</p>;
+    return <p className="mt-4 flex h-8 items-center text-[12.5px] text-ink-3">Skipped</p>;
   }
 
 // One person a run suggested, in a well of their own: who they are, why them, the proof folded to a line, and yes or
-// no. Nothing is saved until you say yes. Passing on someone sinks their well back so the rest stand forward.
+// no. Nothing is saved until you say yes. Skipping someone sinks their well back so the rest stand forward.
 // className and style let a list stagger its rows in.
 export default function Suggestion({ contact, onDecide, pending = false, className = "", style })
   {
