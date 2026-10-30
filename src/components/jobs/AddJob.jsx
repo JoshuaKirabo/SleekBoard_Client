@@ -45,6 +45,10 @@ const doneLine = (run) =>
     return `Filled in from the listing, and found ${found === 1 ? "someone" : `${found} people`} to contact. Check it over.`;
   };
 
+// The server's cheap first look decided the link isn't a job posting (PostingCheck). The run's error says why, and
+// the sheet shows it as is instead of guessing a company and a role from the URL.
+const notAJob = (run) => run.status === "failed" && String(run.error || "").startsWith("Not a job");
+
 // What the link box says while a read is out, naming the site so you know which page is being read.
 const readingText = (url) =>
   {
@@ -178,6 +182,12 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
             current = await getRun(current.id).catch(() => current);
           }
         if(id !== request.current) return;
+        if(!shown && notAJob(current))
+          {
+            setReading(false);
+            setNote({ tone: "warn", text: current.error });
+            return;
+          }
         if(!shown) return plainRead(url, id, current.error ? `The AI couldn't fill it in (${current.error}).` : "The AI couldn't read that posting.");
         setNote({ tone: "ok", text: doneLine(current) });
       };
