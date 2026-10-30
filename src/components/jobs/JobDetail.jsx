@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { longDate } from "./statuses.js";
 import StatusSelect from "./StatusSelect.jsx";
 import CompanyMark from "./CompanyMark.jsx";
+import ContactsSection from "./contacts/ContactsSection.jsx";
 import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon, TrashIcon } from "../icons.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
@@ -43,7 +44,7 @@ function DeleteJob({ onDelete })
 
 // Side panel for one application. Slides in from the right and leaves the same way. It is a frosted layer over the
 // page rather than a modal, so you can still see the board behind it while you read.
-export default function JobDetail({ job, onClose, onStatus, onDelete })
+export default function JobDetail({ job, onClose, onStatus, onDelete, onJobChange })
   {
     const open = Boolean(job);
 
@@ -101,7 +102,9 @@ export default function JobDetail({ job, onClose, onStatus, onDelete })
                 <Row Icon={MailIcon} label="Email">{job.email}</Row>
               </dl>
 
-              <h3 className="mt-6 text-[12px] text-ink-3">Notes</h3>
+              <ContactsSection key={job.id} job={job} onJobChange={onJobChange} />
+
+              <h3 className="mt-8 text-[12px] text-ink-3">Notes</h3>
               {job.notes
                 ? <p className="mt-2 text-[13px] leading-relaxed text-ink">{job.notes}</p>
                 : <p className="mt-2 text-[13px] text-ink-3">Nothing written down yet. Add what you learned from the listing or the recruiter.</p>}

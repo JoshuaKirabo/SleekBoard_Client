@@ -73,6 +73,10 @@ export default function Jobs()
     const hover = useCallback((lane) => setOver((current) => (current === lane ? current : lane)), []);
 
     const close = useCallback(() => setSelectedId(null), []);
+
+    // The server's copy of a job after something else changed it, like its Contact field filling in when you save
+    // someone for it.
+    const replaceJob = useCallback((fresh) => setJobs((list) => list.map((job) => (job.id === fresh.id ? fresh : job))), []);
     const closeGhosted = useCallback(() => setGhostedOpen(false), []);
 
     // A moved card goes to the top of its new lane, the same order the server sends back (most recently touched
@@ -161,7 +165,7 @@ export default function Jobs()
 
         {/* The drawer comes before the details panel so a card's details open on top of it. */}
         <GhostedDrawer open={ghostedOpen} jobs={ghosted} selectedId={selectedId} detailOpen={Boolean(selected)} onOpen={setSelectedId} onClose={closeGhosted} />
-        <JobDetail job={selected} onClose={close} onStatus={setStatus} onDelete={removeJob} />
+        <JobDetail job={selected} onClose={close} onStatus={setStatus} onDelete={removeJob} onJobChange={replaceJob} />
         <AddJob open={adding} onClose={closeAdd} onAdd={addJob} />
 
         {/* A save that didn't land. It sits above the panels so you see it whatever is open. */}

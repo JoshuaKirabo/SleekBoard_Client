@@ -39,6 +39,75 @@ export const deleteJob = async (id) =>
     await http.delete(`/jobs/${id}`);
   };
 
+// The contact finder. Runs happen on the server in the background: the panel starts one, then asks how it's going
+// about once a second until it ends.
+
+// A job's runs, newest first.
+export const listRuns = async (jobId) =>
+  {
+    const { data } = await http.get("/runs", { params: { job: jobId } });
+    return data;
+  };
+
+export const getRun = async (id) =>
+  {
+    const { data } = await http.get(`/runs/${id}`);
+    return data;
+  };
+
+// "contact" looks for who to contact about the job. "note" drafts two notes to one saved contact, so it names them.
+export const startRun = async (kind, jobId, contactId) =>
+  {
+    const { data } = await http.post("/runs", { kind, job: jobId, ...(contactId && { contact: contactId }) });
+    return data;
+  };
+
+// "accept" or "reject" on one of a finished run's suggestions. Gives back the run, the saved contact (or null) and the
+// job, whose Contact field may have filled in.
+export const decideSuggestion = async (runId, index, decision) =>
+  {
+    const { data } = await http.post(`/runs/${runId}/suggestions/${index}`, { decision });
+    return data;
+  };
+
+// Who's saved for the job, and the warm leads at its company: { saved, leads: { contacts, connections,
+// secondDegreeSearch } }.
+export const getJobContacts = async (jobId) =>
+  {
+    const { data } = await http.get(`/jobs/${jobId}/contacts`);
+    return data;
+  };
+
+// lead is { contact: id } for someone saved before, or { connection: id } for a LinkedIn connection.
+export const takeWarmLead = async (jobId, lead) =>
+  {
+    const { data } = await http.post(`/jobs/${jobId}/contacts`, lead);
+    return data;
+  };
+
+export const removeJobContact = async (jobId, contactId) =>
+  {
+    await http.delete(`/jobs/${jobId}/contacts/${contactId}`);
+  };
+
+// Your LinkedIn connections: how many are saved, upload a new Connections.csv, or forget them all.
+export const getConnections = async () =>
+  {
+    const { data } = await http.get("/connections");
+    return data;
+  };
+
+export const importConnections = async (csv) =>
+  {
+    const { data } = await http.put("/connections", { csv });
+    return data;
+  };
+
+export const clearConnections = async () =>
+  {
+    await http.delete("/connections");
+  };
+
 // Job boards that put the company in the path instead of the hostname. The number is which path segment holds it.
 const BOARD_HOSTS = { "boards.greenhouse.io": 0, "job-boards.greenhouse.io": 0, "jobs.lever.co": 0, "jobs.ashbyhq.com": 0, "apply.workable.com": 0, "jobs.smartrecruiters.com": 0 };
 
