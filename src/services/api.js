@@ -173,7 +173,9 @@ const guessFromUrl = (url) =>
     const ownSite = Boolean(company) && !(host in BOARD_HOSTS) && !subdomainBoard && !AGGREGATORS.some((site) => host.endsWith(site));
     const logo = ownSite ? faviconUrl(rootDomain(host)) : company ? faviconUrl(`${slugOf(company)}.com`) : "";
 
-    return { company, role, location: "", logo, link: `${host}${parsed.pathname}`.replace(/\/$/, "") };
+    // The query stays: some boards keep the job's id there (UKG's ?opportunityId=, Greenhouse's ?gh_jid=), and the link
+    // 404s without it.
+    return { company, role, location: "", logo, link: `${host}${parsed.pathname.replace(/\/$/, "")}${parsed.search}` };
   };
 
 // Reads a job posting from its link. The server opens the page (the browser can't, other sites don't allow it) and

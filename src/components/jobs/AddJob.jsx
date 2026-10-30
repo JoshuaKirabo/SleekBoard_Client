@@ -231,7 +231,9 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
             const keys = Object.keys(found).filter((key) => found[key] && key !== "link");
             // A logo you picked yourself outranks the reader's guess.
             const keepLogo = logoSource && logoSource !== "auto";
-            setDraft((current) => ({ ...current, ...found, applied: current.applied, status: current.status, logo: keepLogo ? current.logo : found.logo || current.logo }));
+            // The link box keeps what you pasted. The reader's tidied copy once replaced it, and a second Fill in then read
+            // the tidied link (problem #36).
+            setDraft((current) => ({ ...current, ...found, link: current.link, applied: current.applied, status: current.status, logo: keepLogo ? current.logo : found.logo || current.logo }));
             if(found.logo && !keepLogo)
               {
                 setLogoSource("auto");
