@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { BoardIcon, TableIcon, SearchIcon, FilterIcon, PlusIcon, GhostIcon } from "../icons.jsx";
 import { DRAWER_ID } from "./statuses.js";
+import GmailButton from "./GmailButton.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
@@ -9,14 +10,14 @@ const VIEWS = [
   { id: "table", label: "Table", Icon: TableIcon },
 ];
 
-// View switcher on the left, the Ghosted chip, search and the add button on the right. The switcher is a segmented
+// View switcher on the left, Gmail, the Ghosted chip, search and the add button on the right. The switcher is a segmented
 // control with one sliding pill, so changing views feels like moving a thing instead of swapping two buttons.
 //
 // The Ghosted chip opens the drawer, and it doubles as the Ghosted lane for dragging: let a card go on it and the
 // card goes in the drawer. It swells while a card hovers it, and the count gives a small hop when one lands, the only
 // sign the card arrived, since the drawer stays shut. Below xl it drops the word and keeps the ghost and the count,
 // so the toolbar stays on one row on a small laptop.
-export default function JobsToolbar({ view, onView, query, onQuery, total, onAdd, ghosted, ghostedOpen, onGhosted, dropping })
+export default function JobsToolbar({ view, onView, query, onQuery, total, onAdd, ghosted, ghostedOpen, onGhosted, dropping, gmail, onDisconnect })
   {
     const activeIndex = VIEWS.findIndex((item) => item.id === view);
     const lastGhosted = useRef(ghosted);
@@ -52,6 +53,8 @@ export default function JobsToolbar({ view, onView, query, onQuery, total, onAdd
         <p className="text-[13px] text-ink-3 tabular-nums">{total} applications</p>
 
         <div className="ml-auto flex items-center gap-2">
+          <GmailButton gmail={gmail} onDisconnect={onDisconnect} />
+
           <button
             type="button"
             data-lane={DRAWER_ID}

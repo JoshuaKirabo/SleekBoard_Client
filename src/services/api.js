@@ -39,6 +39,38 @@ export const deleteJob = async (id) =>
     await http.delete(`/jobs/${id}`);
   };
 
+// Undo for a move: puts the card back in "back" and takes the move off its history, so it never happened. If the card
+// has moved again since, the server treats it as a normal move instead.
+export const undoMove = async (id, back) =>
+  {
+    const { data } = await http.patch(`/jobs/${id}`, { status: back, undo: true });
+    return data;
+  };
+
+// "accept" or "dismiss" on the move a reply suggested. Gives back the job.
+export const decideReplySuggestion = async (id, decision) =>
+  {
+    const { data } = await http.post(`/jobs/${id}/reply-suggestion`, { decision });
+    return data;
+  };
+
+// Gmail. Connecting is a plain link, not a request: the server sends you to Google, and Google sends you back to the
+// board with ?gmail=connected or ?gmail=error&reason=….
+export const gmailConnectUrl = `${import.meta.env.VITE_API_URL || ""}/gmail/connect`;
+
+// { status: "connected" | "none" | "expired", configured, address }.
+export const getGmailStatus = async () =>
+  {
+    const { data } = await http.get("/gmail/status");
+    return data;
+  };
+
+export const disconnectGmail = async () =>
+  {
+    const { data } = await http.post("/gmail/disconnect");
+    return data;
+  };
+
 // The contact finder. Runs happen on the server in the background: the panel starts one, then asks how it's going
 // about once a second until it ends.
 

@@ -6,6 +6,8 @@ import { logoFor } from "./logos.js";
 import useLogoTint from "./useLogoTint.js";
 import { DRAWER_ID } from "./statuses.js";
 import { contactsStore } from "./contacts/ContactsStore.js";
+import { statusById } from "./statuses.js";
+import { MailIcon } from "../icons.jsx";
 
 // Deadline reads as how many days are left, since that's what you actually act on. Past ones just show the date.
 const deadlineLabel = (iso) =>
@@ -259,9 +261,16 @@ export default function JobCard({ job, selected, fresh, still = false, onOpen, o
             </g>
           </svg>
 
+          {/* A reply in Gmail shows as a small envelope at the end of the company line, like JobNavigator's ✉. */}
           <div className="flex items-center gap-2.5">
             <CompanyMark job={job} />
             <span className={`truncate text-[13px] font-semibold transition-colors duration-150 ${selected ? "text-cream" : ""}`}>{job.company}</span>
+            {job.replyAt && (
+              <span className="card-meta ml-auto shrink-0 text-ink-3">
+                <MailIcon size={13} />
+                <span className="sr-only">Reply in Gmail</span>
+              </span>
+            )}
           </div>
 
           {/* The small grey lines are "card-meta": on hover they turn a pale version of the brand colour rather than
@@ -274,6 +283,13 @@ export default function JobCard({ job, selected, fresh, still = false, onOpen, o
               <span className="card-meta text-ink-3">{job.applied ? `Applied ${shortDate(job.applied)}` : "Not applied"}</span>
               {deadline && <span className={urgent ? "card-urgent font-medium text-cream" : "card-meta text-ink-3"}>{deadline}</span>}
             </div>
+          )}
+
+          {/* A reply the AI wasn't sure about. The card stays put until you answer it in the panel. */}
+          {job.replySuggestion && (
+            <p className="mt-3 inline-flex rounded-full bg-cream/10 px-2.5 py-1 text-[11px] font-medium text-cream">
+              Reply looks like {statusById(job.replySuggestion.to)?.label || job.replySuggestion.to}
+            </p>
           )}
         </button>
       </div>

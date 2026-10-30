@@ -3,6 +3,7 @@ import { longDate } from "./statuses.js";
 import StatusSelect from "./StatusSelect.jsx";
 import CompanyMark from "./CompanyMark.jsx";
 import ContactsSection from "./contacts/ContactsSection.jsx";
+import ReplyNote from "./ReplyNote.jsx";
 import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon, TrashIcon } from "../icons.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
@@ -92,6 +93,8 @@ export default function JobDetail({ job, onClose, onStatus, onDelete, onJobChang
                 <span className="text-[12px] text-ink-3">Status</span>
                 <StatusSelect look="pill" value={job.status} onChange={(status) => onStatus(job.id, status)} />
               </div>
+
+              <ReplyNote key={`reply-${job.id}`} job={job} onJobChange={onJobChange} />
 
               <dl className="mt-7 flex flex-col gap-1">
                 <Row Icon={PinIcon} label="Location">{job.location}</Row>
