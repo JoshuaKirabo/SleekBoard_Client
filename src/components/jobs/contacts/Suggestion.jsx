@@ -27,8 +27,8 @@ function Decided({ decision, pending })
   }
 
 // One person a run suggested, with the words that prove they work there, and yes or no. Nothing is saved until you
-// say yes.
-export default function Suggestion({ contact, onDecide, pending = false })
+// say yes. className and style let a list stagger its rows in.
+export default function Suggestion({ contact, onDecide, pending = false, className = "", style })
   {
     const [busy, setBusy] = useState(false);
 
@@ -48,7 +48,7 @@ export default function Suggestion({ contact, onDecide, pending = false })
     const place = contact.location && contact.location !== "unknown" ? contact.location : "";
 
     return (
-      <li className="rounded-lg bg-surface p-3.5">
+      <li className={`rounded-lg bg-surface p-3.5 ${className}`} style={style}>
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[14px]">
           <PersonName name={contact.name} link={contact.link} />
           <span className="text-[12px] text-ink-3">{KIND_LABELS[contact.type] || "Contact"}</span>

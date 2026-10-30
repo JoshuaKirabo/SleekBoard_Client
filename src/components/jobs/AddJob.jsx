@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import StatusSelect from "./StatusSelect.jsx";
 import { extractJob, startFill, getRun, attachRun, decideSuggestion, problemOf } from "../../services/api.js";
 import { findLogos, readLogoFile, domainOfLogo, faviconUrl } from "./logos.js";
-import Suggestion from "./contacts/Suggestion.jsx";
+import ContactFinding from "./contacts/ContactFinding.jsx";
 import { isLive } from "./contacts/useRun.js";
-import { stepLine } from "./contacts/contactText.js";
+import { toolOf, stepTarget } from "./contacts/contactText.js";
+import Roll from "./Roll.jsx";
 import CompanyMark from "./CompanyMark.jsx";
 import { CloseIcon, SparkleIcon, LinkIcon, CheckIcon, SearchIcon, UploadIcon } from "../icons.jsx";
 
@@ -28,13 +29,16 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// The line under the link box while Fill in's run works: its latest real step, like "Searched “Intel recruiter
-// Folsom”", once the card is filled.
-const runLine = (run, url) =>
+// The line under the link box while Fill in's run works. Until the card is filled it's a live status: what the run is
+// doing, then the page or search it's on, faded. After that it points down to Who to contact, where the search shows
+// itself working. The model's own sentences are left out, they read as noise in one line.
+const runNote = (run, url) =>
   {
-    const last = run.steps?.at(-1);
-    if(!last) return readingText(url);
-    return `${stepLine(last)}…`;
+    if(run.result?.job) return { tone: "ok", text: "Filled in the card. Check it over while we find who to contact below." };
+    const step = run.steps?.findLast((each) => toolOf(each));
+    if(!step) return readingNote(url);
+    if(toolOf(step) === "fill_job") return { tone: "live", text: "Filling in the card", detail: "" };
+    return { tone: "live", text: "Reading the listing", detail: stepTarget(step) || hostOf(url) };
   };
 
 // What the line says when the run's done, so you know what to check.
@@ -49,12 +53,26 @@ const doneLine = (run) =>
 // the sheet shows it as is instead of guessing a company and a role from the URL.
 const notAJob = (run) => run.status === "failed" && String(run.error || "").startsWith("Not a job");
 
-// What the link box says while a read is out, naming the site so you know which page is being read.
-const readingText = (url) =>
+// The site a link is on, like boards.greenhouse.io.
+const hostOf = (url) => url.trim().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
+
+// What the line says the moment a read goes out, naming the site so you know which page is being read.
+const readingNote = (url) => ({ tone: "live", text: "Reading the listing", detail: hostOf(url) });
+
+// The mark before the line: a pulsing dot while something is working, a check once it's done, nothing otherwise.
+// Both sit in the same 14px box so the words don't jump sideways when one turns into the other.
+const NoteMark = ({ tone }) =>
   {
-    const host = url.trim().replace(/^https?:\/\//, "").split("/")[0];
-    return host ? `Reading the listing on ${host}…` : "Reading the listing…";
+    if(tone !== "live" && tone !== "ok") return null;
+    return (
+      <span aria-hidden="true" className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+        {tone === "live" ? <span className="h-1.5 w-1.5 rounded-full bg-cream motion-safe:animate-pulse" /> : <CheckIcon size={14} className="text-cream" />}
+      </span>
+    );
   };
+
+// The colour of the line's words for each tone. A live line's words shimmer instead, see .shimmer-text.
+const NOTE_COLOURS = { warn: "text-cream", ok: "text-ink-2", live: "text-ink-2", quiet: "text-ink-3" };
 
 // A well the reader fills. While a read is out it's a skeleton (see .well-skeleton) and can't be typed in, and order
 // is its place in the reveal once the answer lands. The skeleton sits on its own span so it never restarts: the inner
@@ -137,6 +155,8 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
     const set = (key) => (event) => setDraft((current) => ({ ...current, [key]: event.target.value }));
 
     const finding = !reading && isLive(run);
+    // Either half of Fill in's run. The button can't be pressed then, but stays bright so it reads as working, not off.
+    const busy = reading || finding;
 
     // Fill in. The wells stay skeletons until the run has filled the card, then the contact search carries on with its
     // steps on the line under the link. If the AI can't start (switched off, or the day's cap is used up), the plain
@@ -148,7 +168,7 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
         setReading(true);
         setRun(null);
         setPicks({});
-        setNote({ tone: "quiet", text: readingText(url) });
+        setNote(readingNote(url));
         let started;
         try
           {
@@ -177,7 +197,7 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
                 await showJob(current.result.job, id);
               }
             if(!isLive(current)) break;
-            setNote({ tone: "quiet", text: runLine(current, url) });
+            setNote(runNote(current, url));
             await wait(1000);
             current = await getRun(current.id).catch(() => current);
           }
@@ -258,12 +278,9 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
           }
       };
 
-    // Your yes or no on a suggested contact. Yes also puts their name in the Contact field if it's empty.
-    const answerContact = (index, contact, decision) =>
-      {
-        setPicks((current) => ({ ...current, [index]: decision }));
-        if(decision === "accept") setDraft((current) => (current.contact.trim() ? current : { ...current, contact: contact.name }));
-      };
+    // Your yes or no on a suggested contact, saved with the job once you add it. The server then fills the job's own
+    // contact and email from them (JobCard.js), so the sheet has no boxes for those.
+    const answerContact = (index, contact, decision) => setPicks((current) => ({ ...current, [index]: decision }));
 
     // After Add to board: the new card becomes the run's job, and the contacts you said yes to are saved for it, the
     // same way as saving them from the card. The job's already on the board by now, so a hiccup here only means the
@@ -434,17 +451,21 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
               <button
                 type="button"
                 onClick={() => read()}
-                disabled={!draft.link.trim() || reading || finding}
-                className={`absolute top-1/2 right-2 flex h-10 -translate-y-1/2 cursor-pointer items-center gap-1.5 rounded-xl bg-cream px-3.5 text-[13px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] disabled:cursor-default disabled:opacity-30 ${focusRing}`}
+                disabled={!draft.link.trim() || busy}
+                aria-busy={busy}
+                className={`absolute top-1/2 right-2 flex h-10 -translate-y-1/2 cursor-pointer items-center gap-1.5 rounded-xl bg-cream px-3.5 text-[13px] font-semibold text-canvas transition-[opacity,scale] duration-100 enabled:hover:opacity-90 enabled:active:scale-[0.97] ${busy ? "cursor-progress" : "disabled:cursor-default disabled:opacity-30"} ${focusRing}`}
               >
-                <SparkleIcon size={14} />
-                {reading ? "Reading" : finding ? "Finding contact" : "Fill in"}
+                <SparkleIcon size={14} className={busy ? "motion-safe:animate-pulse" : ""} />
+                {reading ? "Reading" : finding ? "Finding contacts" : "Fill in"}
               </button>
             </div>
 
-            <p aria-live="polite" style={{ "--i": 2 }} className={`mt-2.5 flex min-h-5 items-center gap-1.5 text-[13px] ${rise} ${note?.tone === "warn" ? "text-cream" : note?.tone === "ok" ? "text-ink-2" : "text-ink-3"}`}>
-              {note?.tone === "ok" && <CheckIcon size={14} className="text-cream" />}
-              {note ? note.text : "Or fill it in yourself below."}
+            {/* The status line. While a read is out: a pulsing dot, what it's doing in shimmering words, then the page or
+                search it's on, faded and cut to one line. Each part rolls on its own when it changes. */}
+            <p aria-live="polite" style={{ "--i": 2 }} className={`mt-2.5 flex min-h-5 items-center gap-1.5 text-[13px] leading-5 ${rise} ${NOTE_COLOURS[note?.tone] || "text-ink-3"}`}>
+              <NoteMark tone={note?.tone} />
+              <Roll text={note ? note.text : "Or fill it in yourself below."} className="min-w-0" lineClass={note?.tone === "live" ? "shimmer-text font-medium" : ""} />
+              <Roll text={note?.tone === "live" && note.detail ? `· ${note.detail}` : ""} className="roll-truncate min-w-0 flex-1 text-ink-3" />
             </p>
 
             {/* The logo row. The tile is a live preview: it shows the reader's guess, what you found, or what you dropped on it,
@@ -534,26 +555,11 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
               <Field label="Deadline" filled={filled.includes("deadline")} stamp={stamp} loading={reading} order={4}>
                 <input type="date" value={draft.deadline} onChange={set("deadline")} className={`${smallWell} tabular-nums`} />
               </Field>
-              <Field label="Contact">
-                <input type="text" value={draft.contact} onChange={set("contact")} placeholder="Recruiter's name" className={smallWell} />
-              </Field>
-              <Field label="Email">
-                <input type="email" value={draft.email} onChange={set("email")} placeholder="name@company.com" className={smallWell} />
-              </Field>
             </div>
 
-            {/* The people Fill in's run suggests, each with the words that prove they work there. Saying yes here saves
-                them with the job once you add it. */}
-            {run?.status === "done" && run.result?.contacts?.length > 0 && (
-              <div className="mt-6">
-                <span className="mb-1.5 block text-[12px] font-medium text-ink-3">Who to contact</span>
-                <ul className="flex flex-col gap-2">
-                  {run.result.contacts.map((contact, index) => (
-                    <Suggestion key={`${run.id}-${index}`} contact={{ ...contact, decision: picks[index] }} pending onDecide={async (decision) => answerContact(index, contact, decision)} />
-                  ))}
-                </ul>
-              </div>
-            )}
+            {/* Who to contact shows up the moment the run fills the card, so the search has somewhere to be seen working.
+                Saying yes to someone here saves them with the job once you add it. */}
+            {run?.result?.job && <ContactFinding run={run} picks={picks} onAnswer={answerContact} />}
 
             {/* Status is a dropdown in the same grid. Once it leaves "To Apply" the applied date opens up beside it. */}
             <div className={`mt-5 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 ${rise}`} style={{ "--i": 5 }}>

@@ -311,13 +311,132 @@ body
       animation: count-hop 360ms var(--ease-out-strong);
    }
 
+/* A line of run progress that has just moved on eases in from a soft blur, so your eye catches that it changed. Only
+   the new line animates; the old one goes at once, so a fast run never stacks two lines on top of each other. */
+@keyframes step-swap
+   {
+      from
+         {
+            opacity: 0;
+            filter: blur(2px);
+            transform: translateY(3px);
+         }
+   }
+
+.step-swap
+   {
+      animation: step-swap 180ms var(--ease-out-strong);
+   }
+
+/* A line that rolls when its words change (Roll.jsx). Both copies sit in the same grid cell, and the box clips them,
+   so the old words slide up out of sight while the new ones come up from below. Nothing stacks: they share one
+   line's height the whole time. */
+.roll
+   {
+      display: inline-grid;
+      grid-template-columns: minmax(0, 1fr);
+      overflow: clip;
+   }
+
+.roll > *
+   {
+      grid-area: 1 / 1;
+   }
+
+/* For a part that has to stay on one line, like the page a read is on. It's cut with an ellipsis instead of wrapping. */
+.roll-truncate > *
+   {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+   }
+
+@keyframes roll-in
+   {
+      from
+         {
+            opacity: 0;
+            filter: blur(2px);
+            transform: translateY(70%);
+         }
+   }
+
+@keyframes roll-out
+   {
+      to
+         {
+            opacity: 0;
+            filter: blur(2px);
+            transform: translateY(-70%);
+         }
+   }
+
+.roll-in
+   {
+      animation: roll-in 240ms var(--ease-out-strong);
+   }
+
+.roll-out
+   {
+      animation: roll-out 200ms var(--ease-out-strong) forwards;
+   }
+
+/* Words that are still being worked on. A brighter band runs across them on the same beat as the skeleton sweep in
+   the wells below, so the line and the fields read as one thing loading. The band sits on the text itself. */
+.shimmer-text
+   {
+      background: linear-gradient(90deg, var(--color-ink-2) 35%, var(--color-ink) 50%, var(--color-ink-2) 65%) 100% 0 / 300% 100% no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: text-sweep 1.4s linear infinite;
+   }
+
+/* Moves the band left to right. The gradient is three times the text's width, so it starts and ends off the words. */
+@keyframes text-sweep
+   {
+      to
+         {
+            background-position: 0 0;
+         }
+   }
+
+/* Reduced motion keeps every signal but drops the travel: lines cross-fade in place and the band holds still. */
+@keyframes fade-in
+   {
+      from
+         {
+            opacity: 0;
+         }
+   }
+
+@keyframes fade-out
+   {
+      to
+         {
+            opacity: 0;
+         }
+   }
+
 @media (prefers-reduced-motion: reduce)
    {
       .count-hop,
       .rise,
-      .card-rise
+      .card-rise,
+      .step-swap,
+      .shimmer-text
          {
             animation-name: none;
+         }
+
+      .roll-in
+         {
+            animation-name: fade-in;
+         }
+
+      .roll-out
+         {
+            animation-name: fade-out;
          }
    }
 

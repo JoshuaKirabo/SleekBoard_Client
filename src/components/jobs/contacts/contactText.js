@@ -61,6 +61,18 @@ const TOOL_LINES =
     fill_job: () => "Filled in the card",
   };
 
+// The tool a log step called, like "web_search", or "" for a step that isn't a tool call.
+export const toolOf = (step) => (step?.type === "tool" ? step.text.split(" ")[0] : "");
+
+// What a tool step was pointed at, with nothing else around it: the page it opened or the words it searched for.
+export const stepTarget = (step) =>
+  {
+    const args = step.text.slice(step.text.indexOf(" ") + 1);
+    if(toolOf(step) === "read_page") return shortLink(argOf(args, "url"));
+    if(toolOf(step) === "web_search") return `“${argOf(args, "query")}”`;
+    return "";
+  };
+
 // One log step as a line to show: what the model said, a tool it used, or a tool that broke.
 export const stepLine = (step) =>
   {
