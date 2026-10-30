@@ -1,11 +1,42 @@
 import http from "./http.js";
 import { faviconUrl, rootDomain, slugOf } from "../components/jobs/logos.js";
 
-// Scaffold stubs — no live requests yet. Hook these up to http.js when ready.
+// Everything the client asks the server for. getHealth is still a stub.
 
 export const getHealth = async () =>
   {
     throw new Error("Not wired: getHealth");
+  };
+
+// A failed request as one sentence to show. The server sends its own message; no reply at all means it isn't up.
+export const problemOf = (error) => error.response?.data?.message || "Couldn't reach the SleekBoard server.";
+
+// The board's jobs, saved in Mongo. Each one hands back the server's copy, so the id is always Mongo's.
+
+// Every job, most recently touched first.
+export const listJobs = async () =>
+  {
+    const { data } = await http.get("/jobs");
+    return data;
+  };
+
+// The server ignores any id we send and makes its own, so a new card should use the one that comes back.
+export const createJob = async (job) =>
+  {
+    const { data } = await http.post("/jobs", job);
+    return data;
+  };
+
+// Send just what changed, like { status: "interviewing" } after a drag.
+export const updateJob = async (id, changes) =>
+  {
+    const { data } = await http.patch(`/jobs/${id}`, changes);
+    return data;
+  };
+
+export const deleteJob = async (id) =>
+  {
+    await http.delete(`/jobs/${id}`);
   };
 
 // Job boards that put the company in the path instead of the hostname. The number is which path segment holds it.
@@ -90,7 +121,6 @@ export const extractJob = async (url) =>
       }
     catch(error)
       {
-        const reason = error.response?.data?.message || "Couldn't reach the SleekBoard server.";
-        return { ...guess, via: "link", reason };
+        return { ...guess, via: "link", reason: problemOf(error) };
       }
   };

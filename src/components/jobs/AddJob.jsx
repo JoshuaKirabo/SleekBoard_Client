@@ -50,6 +50,9 @@ export default function AddJob({ open, onClose, onAdd })
     const [logoSource, setLogoSource] = useState("");
     const [finder, setFinder] = useState(NO_FINDER);
     const [logoNote, setLogoNote] = useState("");
+    // The save to Mongo. The sheet stays open until it lands, so a failed save keeps everything you typed.
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState("");
     const linkInput = useRef(null);
     const fileInput = useRef(null);
     const request = useRef(0);
@@ -66,6 +69,8 @@ export default function AddJob({ open, onClose, onAdd })
         setLogoSource("");
         setFinder(NO_FINDER);
         setLogoNote("");
+        setSaving(false);
+        setSaveError("");
         // Wait for the slide-in so the focus ring doesn't flash on the way up.
         const timer = setTimeout(() => linkInput.current?.focus(), 120);
         const onKey = (event) => event.key === "Escape" && onClose();
@@ -198,15 +203,29 @@ export default function AddJob({ open, onClose, onAdd })
 
     const valid = draft.company.trim() && draft.role.trim();
 
-    const submit = (event) =>
+    // Mongo hands out the id, so the job goes up without one and the card appears once the server answers.
+    const submit = async (event) =>
       {
         event.preventDefault();
         setAttempted(true);
-        if(!valid) return;
+        if(!valid || saving) return;
         const applied = draft.status !== "saved" && !draft.applied ? today() : draft.applied;
         const link = draft.link.trim().replace(/^https?:\/\//, "").replace(/\/$/, "");
-        onAdd({ ...draft, applied, link, logo: draft.logo || "", company: draft.company.trim(), role: draft.role.trim(), id: `j${Date.now()}` });
-        onClose();
+        setSaving(true);
+        setSaveError("");
+        try
+          {
+            await onAdd({ ...draft, applied, link, logo: draft.logo || "", company: draft.company.trim(), role: draft.role.trim() });
+            onClose();
+          }
+        catch(error)
+          {
+            setSaveError(error.message);
+          }
+        finally
+          {
+            setSaving(false);
+          }
       };
 
     const missing = (key) => attempted && !draft[key].trim();
@@ -382,12 +401,13 @@ export default function AddJob({ open, onClose, onAdd })
 
           <div className={`flex items-center justify-end gap-3 px-7 pb-6 ${rise}`} style={{ "--i": 7 }}>
             {attempted && !valid && <p className="mr-auto text-[12px] text-cream">Company and role are the minimum.</p>}
+            {valid && saveError && <p aria-live="polite" className="mr-auto text-[12px] text-cream">{saveError}</p>}
             <div className="flex items-center gap-1.5">
               <button type="button" onClick={onClose} className={`h-11 cursor-pointer rounded-full px-4 text-[13px] font-medium text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink ${focusRing}`}>
                 Cancel
               </button>
-              <button type="submit" className={`h-11 cursor-pointer rounded-full bg-ink px-5 text-[14px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] ${focusRing} focus-visible:outline-ink`}>
-                Add to board
+              <button type="submit" disabled={saving} className={`h-11 cursor-pointer rounded-full bg-ink px-5 text-[14px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] disabled:cursor-default disabled:opacity-60 ${focusRing} focus-visible:outline-ink`}>
+                {saving ? "Adding…" : "Add to board"}
               </button>
             </div>
           </div>

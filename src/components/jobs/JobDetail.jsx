@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { longDate } from "./statuses.js";
 import StatusSelect from "./StatusSelect.jsx";
 import CompanyMark from "./CompanyMark.jsx";
-import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon } from "../icons.jsx";
+import { CloseIcon, ArrowUpRightIcon, PinIcon, CalendarIcon, LinkIcon, PersonIcon, MailIcon, TrashIcon } from "../icons.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
@@ -14,9 +14,36 @@ const Row = ({ Icon, label, children }) => (
   </div>
 );
 
+// Deleting takes two clicks. The first turns the bin into "Delete for good?" and the second does it. Left alone for
+// three seconds it calms back down, so a stray click never costs you a job. The panel keys it by job, so opening
+// another card starts it fresh.
+function DeleteJob({ onDelete })
+  {
+    const [armed, setArmed] = useState(false);
+
+    useEffect(() =>
+      {
+        if(!armed) return;
+        const timer = setTimeout(() => setArmed(false), 3000);
+        return () => clearTimeout(timer);
+      }, [armed]);
+
+    return (
+      <button
+        type="button"
+        onClick={() => (armed ? onDelete() : setArmed(true))}
+        aria-label={armed ? "Click again to delete this job" : "Delete job"}
+        className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-full text-[13px] font-medium transition-colors duration-150 ${armed ? "bg-halt/15 pr-3.5 pl-3 text-halt hover:bg-halt/25" : "w-9 justify-center text-ink-2 hover:bg-raised hover:text-halt"} ${focusRing}`}
+      >
+        <TrashIcon size={15} />
+        {armed && "Delete for good?"}
+      </button>
+    );
+  }
+
 // Side panel for one application. Slides in from the right and leaves the same way. It is a frosted layer over the
 // page rather than a modal, so you can still see the board behind it while you read.
-export default function JobDetail({ job, onClose, onStatus })
+export default function JobDetail({ job, onClose, onStatus, onDelete })
   {
     const open = Boolean(job);
 
@@ -40,10 +67,13 @@ export default function JobDetail({ job, onClose, onStatus })
               <button type="button" onClick={onClose} className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink ${focusRing}`} aria-label="Close details">
                 <CloseIcon size={16} />
               </button>
-              <a href={`https://${job.link}`} target="_blank" rel="noreferrer" className={`flex h-9 items-center gap-1 rounded-full bg-raised pr-3 pl-3.5 text-[13px] text-ink-2 transition-colors duration-150 hover:text-ink ${focusRing}`}>
-                Open listing
-                <ArrowUpRightIcon size={14} />
-              </a>
+              <div className="flex items-center gap-1.5">
+                <DeleteJob key={job.id} onDelete={() => onDelete(job.id)} />
+                <a href={`https://${job.link}`} target="_blank" rel="noreferrer" className={`flex h-9 items-center gap-1 rounded-full bg-raised pr-3 pl-3.5 text-[13px] text-ink-2 transition-colors duration-150 hover:text-ink ${focusRing}`}>
+                  Open listing
+                  <ArrowUpRightIcon size={14} />
+                </a>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 pb-8">
