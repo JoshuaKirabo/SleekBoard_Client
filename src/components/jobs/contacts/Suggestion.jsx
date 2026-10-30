@@ -11,15 +11,15 @@ export function PersonName({ name, link })
     return <a href={href} target="_blank" rel="noreferrer" className="font-medium text-ink underline-offset-2 hover:underline">{name}</a>;
   }
 
-// What you've already said about a suggestion.
-function Decided({ decision })
+// What you've already said about a suggestion. pending is the add sheet, where the job doesn't exist yet.
+function Decided({ decision, pending })
   {
     if(decision === "accept")
       {
         return (
           <p className="mt-3 flex items-center gap-1.5 text-[12px] text-go">
             <CheckIcon size={13} />
-            Saved to this job's contacts
+            {pending ? "Saved with the job when you add it" : "Saved to this job's contacts"}
           </p>
         );
       }
@@ -28,7 +28,7 @@ function Decided({ decision })
 
 // One person a run suggested, with the words that prove they work there, and yes or no. Nothing is saved until you
 // say yes.
-export default function Suggestion({ contact, onDecide })
+export default function Suggestion({ contact, onDecide, pending = false })
   {
     const [busy, setBusy] = useState(false);
 
@@ -58,7 +58,7 @@ export default function Suggestion({ contact, onDecide })
         <p className="mt-1 truncate text-[11px] text-ink-3">{shortLink(contact.link)}</p>
         {contact.reason && <p className="mt-2 text-[13px] leading-relaxed text-ink">{contact.reason}</p>}
         {contact.decision
-          ? <Decided decision={contact.decision} />
+          ? <Decided decision={contact.decision} pending={pending} />
           : (
             <div className="mt-3 flex items-center gap-1">
               <button type="button" disabled={busy} onClick={() => decide("accept")} className={mainButton}>Save contact</button>

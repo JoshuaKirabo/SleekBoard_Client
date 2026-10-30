@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import StatusSelect from "./StatusSelect.jsx";
-import { extractJob } from "../../services/api.js";
-import { findLogos, readLogoFile, domainOfLogo } from "./logos.js";
+import { extractJob, startFill, getRun, attachRun, decideSuggestion, problemOf } from "../../services/api.js";
+import { findLogos, readLogoFile, domainOfLogo, faviconUrl } from "./logos.js";
+import Suggestion from "./contacts/Suggestion.jsx";
+import { isLive } from "./contacts/useRun.js";
+import { stepLine } from "./contacts/contactText.js";
 import CompanyMark from "./CompanyMark.jsx";
 import { CloseIcon, SparkleIcon, LinkIcon, CheckIcon, SearchIcon, UploadIcon } from "../icons.jsx";
 
@@ -22,6 +25,25 @@ const NO_FINDER = { open: false, query: "", results: [], searching: false, searc
 const chip = `flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-canvas px-3 text-[12.5px] font-medium text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink active:bg-raised disabled:cursor-default disabled:opacity-40 ${focusRing}`;
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// The line under the link box while Fill in's run works: its latest real step, like "Searched “Intel recruiter
+// Folsom”", once the card is filled.
+const runLine = (run, url) =>
+  {
+    const last = run.steps?.at(-1);
+    if(!last) return readingText(url);
+    return `${stepLine(last)}…`;
+  };
+
+// What the line says when the run's done, so you know what to check.
+const doneLine = (run) =>
+  {
+    const found = run.result?.contacts?.length || 0;
+    if(!found) return "Filled in from the listing. Nobody to contact could be confirmed. Check it over.";
+    return `Filled in from the listing, and found ${found === 1 ? "someone" : `${found} people`} to contact. Check it over.`;
+  };
 
 // What the link box says while a read is out, naming the site so you know which page is being read.
 const readingText = (url) =>
@@ -53,9 +75,10 @@ const Field = ({ label, filled, stamp, loading = false, order, className = "", c
   </label>
 );
 
-// The add flow leads with the link. Paste one, press Fill in, and the reader fills what it can. The rest is there for
-// what it missed or for roles you only heard about. The server reads the page; see extractJob for the fallback.
-export default function AddJob({ open, onClose, onAdd })
+// The add flow leads with the link. Paste one and press Fill in: one AI run reads the posting, fills the card and finds
+// who to contact (Josh, 2026-10-30). Everything waits here for you to check it over, and nothing reaches the board until
+// Add to board. The rest is there for what it missed or for roles you only heard about.
+export default function AddJob({ open, onClose, onAdd, onJobChange })
   {
     const [draft, setDraft] = useState(EMPTY);
     const [filled, setFilled] = useState([]);
@@ -71,6 +94,9 @@ export default function AddJob({ open, onClose, onAdd })
     // The save to Mongo. The sheet stays open until it lands, so a failed save keeps everything you typed.
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState("");
+    // Fill in's run, and your yes or no on each contact it suggests, by its place in the list.
+    const [run, setRun] = useState(null);
+    const [picks, setPicks] = useState({});
     const linkInput = useRef(null);
     const fileInput = useRef(null);
     const request = useRef(0);
@@ -78,7 +104,11 @@ export default function AddJob({ open, onClose, onAdd })
 
     useEffect(() =>
       {
+        // Closing stops following a run, so a run that finishes later can't write into the next sheet.
+        request.current++;
         if(!open) return;
+        setRun(null);
+        setPicks({});
         setDraft(EMPTY);
         setFilled([]);
         setReading(false);
@@ -102,12 +132,88 @@ export default function AddJob({ open, onClose, onAdd })
 
     const set = (key) => (event) => setDraft((current) => ({ ...current, [key]: event.target.value }));
 
+    const finding = !reading && isLive(run);
+
+    // Fill in. The wells stay skeletons until the run has filled the card, then the contact search carries on with its
+    // steps on the line under the link. If the AI can't start (switched off, or the day's cap is used up), the plain
+    // link reader fills in instead and says why.
     const read = async (url = draft.link) =>
       {
-        if(!url.trim() || reading) return;
+        if(!url.trim() || reading || finding) return;
         const id = ++request.current;
         setReading(true);
+        setRun(null);
+        setPicks({});
         setNote({ tone: "quiet", text: readingText(url) });
+        let started;
+        try
+          {
+            started = await startFill(url.trim());
+          }
+        catch(error)
+          {
+            if(id === request.current) await plainRead(url, id, `The AI didn't start: ${problemOf(error)}`);
+            return;
+          }
+        await follow(started, id, url);
+      };
+
+    // Asks about the run once a second until it ends, the same way a card follows its runs. The card is shown the
+    // moment the run has filled it in, without waiting for the contact.
+    const follow = async (first, id, url) =>
+      {
+        let current = first;
+        let shown = false;
+        while(id === request.current)
+          {
+            setRun(current);
+            if(!shown && current.result?.job)
+              {
+                shown = true;
+                await showJob(current.result.job, id);
+              }
+            if(!isLive(current)) break;
+            setNote({ tone: "quiet", text: runLine(current, url) });
+            await wait(1000);
+            current = await getRun(current.id).catch(() => current);
+          }
+        if(id !== request.current) return;
+        if(!shown) return plainRead(url, id, current.error ? `The AI couldn't fill it in (${current.error}).` : "The AI couldn't read that posting.");
+        setNote({ tone: "ok", text: doneLine(current) });
+      };
+
+    // The card the run filled in goes into the wells, and the skeletons lift. Fields it left empty keep whatever you
+    // typed. The logo comes from the employer's site when the run knows it, or a lookup by name.
+    const showJob = async (job, id) =>
+      {
+        const found = Object.fromEntries(["company", "role", "location", "deadline"].filter((key) => job[key]).map((key) => [key, job[key]]));
+        const keepLogo = logoSource && logoSource !== "auto";
+        const logo = !keepLogo && job.domain ? faviconUrl(job.domain) : "";
+        setDraft((current) => ({ ...current, ...found, ...(logo && { logo }) }));
+        if(logo)
+          {
+            setLogoSource("auto");
+            setLogoNote(`From ${job.domain}`);
+          }
+        setFilled([...Object.keys(found), ...(logo ? ["logo"] : [])]);
+        setStamp(id);
+        setReading(false);
+        if(!logo && !keepLogo && job.company) await lookUpLogo(job.company, id);
+      };
+
+    const lookUpLogo = async (company, id) =>
+      {
+        const [hit] = await findLogos(company);
+        if(!hit || id !== request.current) return;
+        setDraft((current) => ({ ...current, logo: hit.url }));
+        setLogoSource("auto");
+        setLogoNote(`From ${hit.domain}`);
+      };
+
+    // The plain link reader, without the AI. why says why the AI didn't do it.
+    const plainRead = async (url, id, why = "") =>
+      {
+        const lead = why ? `${why} ` : "";
         try
           {
             const { via, reason, ...found } = await extractJob(url);
@@ -125,9 +231,9 @@ export default function AddJob({ open, onClose, onAdd })
             setStamp(id);
             // Say whether we read the page or only guessed from the link, so you know how far to trust it.
             const host = found.link.split("/")[0];
-            if(!keys.length) setNote({ tone: "quiet", text: "Couldn't tell much from that link. Fill it in by hand." });
-            else if(via === "page") setNote({ tone: "ok", text: `Read the listing on ${host}. Check it over.` });
-            else setNote({ tone: "quiet", text: `${reason} Guessed what we could from the link.` });
+            if(!keys.length) setNote({ tone: "quiet", text: `${lead}Couldn't tell much from that link. Fill it in by hand.` });
+            else if(via === "page") setNote({ tone: "ok", text: `${lead}Read the listing on ${host}. Check it over.` });
+            else setNote({ tone: "quiet", text: `${lead}${reason} Guessed what we could from the link.` });
           }
         catch(error)
           {
@@ -137,6 +243,34 @@ export default function AddJob({ open, onClose, onAdd })
         finally
           {
             if(id === request.current) setReading(false);
+          }
+      };
+
+    // Your yes or no on a suggested contact. Yes also puts their name in the Contact field if it's empty.
+    const answerContact = (index, contact, decision) =>
+      {
+        setPicks((current) => ({ ...current, [index]: decision }));
+        if(decision === "accept") setDraft((current) => (current.contact.trim() ? current : { ...current, contact: contact.name }));
+      };
+
+    // After Add to board: the new card becomes the run's job, and the contacts you said yes to are saved for it, the
+    // same way as saving them from the card. The job's already on the board by now, so a hiccup here only means the
+    // card shows the suggestions instead, still unanswered.
+    const keepContacts = async (job) =>
+      {
+        if(!run || !job) return;
+        try
+          {
+            await attachRun(run.id, job.id);
+            for(const [index, decision] of Object.entries(picks))
+              {
+                const answer = await decideSuggestion(run.id, Number(index), decision);
+                if(answer.job) onJobChange?.(answer.job);
+              }
+          }
+        catch(error)
+          {
+            console.error("Couldn't save the picked contacts with the job:", problemOf(error));
           }
       };
 
@@ -233,7 +367,8 @@ export default function AddJob({ open, onClose, onAdd })
         setSaveError("");
         try
           {
-            await onAdd({ ...draft, applied, link, logo: draft.logo || "", company: draft.company.trim(), role: draft.role.trim() });
+            const job = await onAdd({ ...draft, applied, link, logo: draft.logo || "", company: draft.company.trim(), role: draft.role.trim() });
+            await keepContacts(job);
             onClose();
           }
         catch(error)
@@ -287,11 +422,11 @@ export default function AddJob({ open, onClose, onAdd })
               <button
                 type="button"
                 onClick={() => read()}
-                disabled={!draft.link.trim() || reading}
+                disabled={!draft.link.trim() || reading || finding}
                 className={`absolute top-1/2 right-2 flex h-10 -translate-y-1/2 cursor-pointer items-center gap-1.5 rounded-xl bg-cream px-3.5 text-[13px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] disabled:cursor-default disabled:opacity-30 ${focusRing}`}
               >
                 <SparkleIcon size={14} />
-                {reading ? "Reading" : "Fill in"}
+                {reading ? "Reading" : finding ? "Finding contact" : "Fill in"}
               </button>
             </div>
 
@@ -394,6 +529,19 @@ export default function AddJob({ open, onClose, onAdd })
                 <input type="email" value={draft.email} onChange={set("email")} placeholder="name@company.com" className={smallWell} />
               </Field>
             </div>
+
+            {/* The people Fill in's run suggests, each with the words that prove they work there. Saying yes here saves
+                them with the job once you add it. */}
+            {run?.status === "done" && run.result?.contacts?.length > 0 && (
+              <div className="mt-6">
+                <span className="mb-1.5 block text-[12px] font-medium text-ink-3">Who to contact</span>
+                <ul className="flex flex-col gap-2">
+                  {run.result.contacts.map((contact, index) => (
+                    <Suggestion key={`${run.id}-${index}`} contact={{ ...contact, decision: picks[index] }} pending onDecide={async (decision) => answerContact(index, contact, decision)} />
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Status is a dropdown in the same grid. Once it leaves "To Apply" the applied date opens up beside it. */}
             <div className={`mt-5 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 ${rise}`} style={{ "--i": 5 }}>

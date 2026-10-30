@@ -113,6 +113,7 @@ export default function Jobs()
         // The rise plays once. Clearing the flag after it lands keeps a later drag from replaying it in the new lane.
         setFreshId(job.id);
         setTimeout(() => setFreshId(null), 600);
+        return job;
       };
 
     // Gone from the board at once. If the server says no, it comes back in the same spot. A 404 means it was already
@@ -166,7 +167,7 @@ export default function Jobs()
         {/* The drawer comes before the details panel so a card's details open on top of it. */}
         <GhostedDrawer open={ghostedOpen} jobs={ghosted} selectedId={selectedId} detailOpen={Boolean(selected)} onOpen={setSelectedId} onClose={closeGhosted} />
         <JobDetail job={selected} onClose={close} onStatus={setStatus} onDelete={removeJob} onJobChange={replaceJob} />
-        <AddJob open={adding} onClose={closeAdd} onAdd={addJob} />
+        <AddJob open={adding} onClose={closeAdd} onAdd={addJob} onJobChange={replaceJob} />
 
         {/* A save that didn't land. It sits above the panels so you see it whatever is open. */}
         <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">

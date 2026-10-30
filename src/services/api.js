@@ -62,6 +62,20 @@ export const startRun = async (kind, jobId, contactId) =>
     return data;
   };
 
+// Fill in: one AI run from a link, before the job exists. It reads the posting, fills the card and finds the contact.
+export const startFill = async (link) =>
+  {
+    const { data } = await http.post("/runs", { kind: "fill", link });
+    return data;
+  };
+
+// Add to board after Fill in: the new card becomes the run's job, so its suggested contacts can be saved for it.
+export const attachRun = async (runId, jobId) =>
+  {
+    const { data } = await http.post(`/runs/${runId}/job`, { job: jobId });
+    return data;
+  };
+
 // "accept" or "reject" on one of a finished run's suggestions. Gives back the run, the saved contact (or null) and the
 // job, whose Contact field may have filled in.
 export const decideSuggestion = async (runId, index, decision) =>

@@ -58,6 +58,7 @@ const TOOL_LINES =
     read_page: (args) => `Read ${shortLink(argOf(args, "url"))}`,
     suggest_contact: (args) => `Suggested ${argOf(args, "name") || "someone"}`,
     save_notes: () => "Wrote the notes",
+    fill_job: () => "Filled in the card",
   };
 
 // One log step as a line to show: what the model said, a tool it used, or a tool that broke.

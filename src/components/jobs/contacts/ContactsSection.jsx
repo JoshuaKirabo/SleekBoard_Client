@@ -96,7 +96,8 @@ export default function ContactsSection({ job, onJobChange })
         setConnections(summary);
       });
 
-    const contactRun = runs.find((run) => run.kind === "contact");
+    // A Fill in run finds contacts too, so the card picks up its suggestions when it's the latest.
+    const contactRun = runs.find((run) => run.kind === "contact" || run.kind === "fill");
     const noteRunFor = (contact) => runs.find((run) => run.kind === "note" && run.input?.contact === contact.id);
     const hasLeads = Boolean(book && (book.leads.contacts.length || book.leads.connections.length));
     const quiet = book && !book.saved.length && !contactRun && !hasLeads;
