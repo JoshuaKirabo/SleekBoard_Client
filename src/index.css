@@ -338,3 +338,99 @@ body
    {
       animation: well-landed 900ms ease-out 1;
    }
+
+/* While a read is out, every well it will fill turns into a skeleton: same size and shape, its text hidden under a
+   cover, with a soft band sweeping across. It lasts exactly as long as the read, because the sheet's reading flag is
+   what switches it on and off. When the answer lands the covers lift one after another, 40ms apart (--k is each
+   well's place in line), and each well's landed flash waits for its own cover. */
+.well-skeleton
+   {
+      position: relative;
+      display: block;
+      border-radius: 0.75rem;
+   }
+
+.well-skeleton::before,
+.well-skeleton::after
+   {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+   }
+
+/* The cover. It lifts on its own beat, which is what makes the reveal cascade. Going on it waits for nothing. */
+.well-skeleton::before
+   {
+      background-color: var(--color-canvas);
+      transition: opacity 200ms var(--ease-out-strong);
+      transition-delay: calc(var(--k, 0) * 40ms);
+   }
+
+/* The band. It goes the moment the read ends, with no fade, because the well stops clipping it then and a fading
+   band would show past the edge. */
+.well-skeleton::after
+   {
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-cream) 9%, transparent), transparent);
+      transform: translateX(-100%);
+   }
+
+.well-skeleton[data-loading]
+   {
+      overflow: clip;
+   }
+
+.well-skeleton[data-loading]::before
+   {
+      opacity: 1;
+      transition-delay: 0ms;
+   }
+
+/* Moving the band with transform keeps the sweep off the main thread, so it stays smooth while the sheet is busy. */
+.well-skeleton[data-loading]::after
+   {
+      opacity: 1;
+      animation: well-sweep 1.4s linear infinite;
+   }
+
+.well-skeleton .well-landed
+   {
+      animation-delay: calc(var(--k, 0) * 40ms);
+   }
+
+@keyframes well-sweep
+   {
+      from
+         {
+            transform: translateX(-100%);
+         }
+      to
+         {
+            transform: translateX(100%);
+         }
+   }
+
+/* Reduced motion keeps the "still reading" signal but drops the movement: the band sits still and glows. */
+@keyframes well-glow
+   {
+      from
+         {
+            opacity: 0.35;
+         }
+      to
+         {
+            opacity: 1;
+         }
+   }
+
+@media (prefers-reduced-motion: reduce)
+   {
+      .well-skeleton[data-loading]::after
+         {
+            transform: none;
+            animation: well-glow 1.6s var(--ease-soft) infinite alternate;
+         }
+   }

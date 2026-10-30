@@ -23,15 +23,33 @@ const chip = `flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-canva
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+// What the link box says while a read is out, naming the site so you know which page is being read.
+const readingText = (url) =>
+  {
+    const host = url.trim().replace(/^https?:\/\//, "").split("/")[0];
+    return host ? `Reading the listing on ${host}…` : "Reading the listing…";
+  };
+
+// A well the reader fills. While a read is out it's a skeleton (see .well-skeleton) and can't be typed in, and order
+// is its place in the reveal once the answer lands. The skeleton sits on its own span so it never restarts: the inner
+// span's key changes to replay the landed flash, and remounting the skeleton with it would cut the reveal short.
+const Fillable = ({ loading, order, filled, stamp, children }) => (
+  <span className="well-skeleton" data-loading={loading || undefined} inert={loading} style={{ "--k": order }}>
+    <span key={filled ? stamp : "plain"} className={`block rounded-xl ${filled ? "well-landed" : ""}`}>{children}</span>
+  </span>
+);
+
 // A labelled input. "filled" marks the ones the link reader wrote and flashes the well once so your eye lands on
-// what to check. The key on the span restarts the flash if the same field gets filled again.
-const Field = ({ label, filled, stamp, className = "", children }) => (
+// what to check. Pass order for a field the reader can fill, so it turns into a skeleton while a read is out.
+const Field = ({ label, filled, stamp, loading = false, order, className = "", children }) => (
   <label className={`block ${className}`}>
     <span className="mb-1.5 flex items-center gap-1.5 text-[12px] font-medium text-ink-3">
       {label}
       {filled && <SparkleIcon size={11} className="text-cream" />}
     </span>
-    <span key={filled ? stamp : "plain"} className={`block rounded-xl ${filled ? "well-landed" : ""}`}>{children}</span>
+    {order === undefined
+      ? <span className="block rounded-xl">{children}</span>
+      : <Fillable loading={loading} order={order} filled={filled} stamp={stamp}>{children}</Fillable>}
   </label>
 );
 
@@ -89,7 +107,7 @@ export default function AddJob({ open, onClose, onAdd })
         if(!url.trim() || reading) return;
         const id = ++request.current;
         setReading(true);
-        setNote({ tone: "quiet", text: "Reading the listing…" });
+        setNote({ tone: "quiet", text: readingText(url) });
         try
           {
             const { via, reason, ...found } = await extractJob(url);
@@ -275,7 +293,6 @@ export default function AddJob({ open, onClose, onAdd })
                 <SparkleIcon size={14} />
                 {reading ? "Reading" : "Fill in"}
               </button>
-              <span aria-hidden="true" className={`absolute right-5 bottom-0 left-5 h-[3px] origin-left rounded-full bg-cream transition-transform ease-out ${reading ? "scale-x-100 duration-[900ms]" : "scale-x-0 duration-200"}`} />
             </div>
 
             <p aria-live="polite" style={{ "--i": 2 }} className={`mt-2.5 flex min-h-5 items-center gap-1.5 text-[13px] ${rise} ${note?.tone === "warn" ? "text-cream" : note?.tone === "ok" ? "text-ink-2" : "text-ink-3"}`}>
@@ -285,12 +302,14 @@ export default function AddJob({ open, onClose, onAdd })
 
             {/* The logo row. The tile is a live preview: it shows the reader's guess, what you found, or what you dropped on it,
                 and falls back to the company's first letter. Drop an image on the tile or use the two chips. */}
-            <div style={{ "--i": 3 }} className={`mt-6 ${rise} transition-opacity duration-200 ${reading ? "opacity-50" : "opacity-100"}`}>
+            <div style={{ "--i": 3 }} aria-busy={reading} className={`mt-6 ${rise}`}>
               <div className="flex items-center gap-4">
-                <span key={filled.includes("logo") ? stamp : "plain"} onDrop={onDrop} onDragOver={(event) => event.preventDefault()} className={`block rounded-xl ${filled.includes("logo") ? "well-landed" : ""}`}>
-                  <CompanyMark name={draft.company} logo={draft.logo || null} size="h-14 w-14 text-[22px]" radius="rounded-xl" fallback="bg-canvas" />
+                <span onDrop={onDrop} onDragOver={(event) => event.preventDefault()} className="block shrink-0">
+                  <Fillable loading={reading} order={0} filled={filled.includes("logo")} stamp={stamp}>
+                    <CompanyMark name={draft.company} logo={draft.logo || null} size="h-14 w-14 text-[22px]" radius="rounded-xl" fallback="bg-canvas" />
+                  </Fillable>
                 </span>
-                <div className="min-w-0 flex-1">
+                <div className={`min-w-0 flex-1 transition-opacity duration-200 ${reading ? "opacity-50" : "opacity-100"}`}>
                   <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink-3">
                     Logo
                     {filled.includes("logo") && <SparkleIcon size={11} className="text-cream" />}
@@ -355,17 +374,17 @@ export default function AddJob({ open, onClose, onAdd })
             </div>
 
             {/* Company and role are the two that matter, so they get the big wells. The rest sit smaller underneath. */}
-            <div style={{ "--i": 4 }} className={`mt-5 grid grid-cols-1 gap-x-4 gap-y-5 transition-opacity duration-200 sm:grid-cols-2 ${rise} ${reading ? "opacity-50" : "opacity-100"}`}>
-              <Field label="Company" filled={filled.includes("company")} stamp={stamp}>
+            <div style={{ "--i": 4 }} aria-busy={reading} className={`mt-5 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 ${rise}`}>
+              <Field label="Company" filled={filled.includes("company")} stamp={stamp} loading={reading} order={1}>
                 <input type="text" value={draft.company} onChange={set("company")} onBlur={guessLogo} placeholder="Stripe" className={`${bigWell} ${missing("company") ? "ring-2 ring-cream/60 ring-inset" : ""}`} aria-invalid={missing("company")} />
               </Field>
-              <Field label="Role" filled={filled.includes("role")} stamp={stamp}>
+              <Field label="Role" filled={filled.includes("role")} stamp={stamp} loading={reading} order={2}>
                 <input type="text" value={draft.role} onChange={set("role")} placeholder="Frontend Engineer" className={`${bigWell} ${missing("role") ? "ring-2 ring-cream/60 ring-inset" : ""}`} aria-invalid={missing("role")} />
               </Field>
-              <Field label="Location" filled={filled.includes("location")} stamp={stamp}>
+              <Field label="Location" filled={filled.includes("location")} stamp={stamp} loading={reading} order={3}>
                 <input type="text" value={draft.location} onChange={set("location")} placeholder="Remote" className={smallWell} />
               </Field>
-              <Field label="Deadline" filled={filled.includes("deadline")} stamp={stamp}>
+              <Field label="Deadline" filled={filled.includes("deadline")} stamp={stamp} loading={reading} order={4}>
                 <input type="date" value={draft.deadline} onChange={set("deadline")} className={`${smallWell} tabular-nums`} />
               </Field>
               <Field label="Contact">
