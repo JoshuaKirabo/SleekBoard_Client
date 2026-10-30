@@ -43,10 +43,10 @@ const phaseText = (steps) =>
     return "Starting the search";
   };
 
-// A row the size of a suggestion, with the same sweep as the wells while they're read.
+// A well the size of a suggestion, with the same sweep as the wells while they're read.
 const Placeholder = ({ order }) => (
-  <li className="well-skeleton rise rounded-lg" data-loading style={{ "--i": order }}>
-    <div className="h-24 rounded-lg" />
+  <li className="well-skeleton rise rounded-2xl" data-loading style={{ "--i": order }}>
+    <div className="h-52 rounded-2xl" />
   </li>
 );
 
