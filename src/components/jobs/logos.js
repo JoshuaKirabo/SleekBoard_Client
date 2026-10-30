@@ -121,15 +121,15 @@ export const readLogoFile = (file) =>
       reader.readAsDataURL(file);
     });
 
-// Brand colour, for the card hover. The favicon service won't let a canvas read its pixels, so remote logos are
-// sampled through our own API; uploads are data URLs and sample directly. Resolves to an "r g b" triple for a CSS
-// custom property, or null when the logo is monochrome, missing, or the API is down. Cached per logo for the session.
+// Reading a logo's pixels, for its brand colour (the card hover) and for whether it needs a tile behind it. The favicon
+// service won't let a canvas read its pixels, so remote logos are sampled through our own API; uploads are data URLs
+// and sample directly. Each logo is read once per session.
 // Where to fetch a logo we're allowed to read. In dev, Vite proxies /logos to the favicon service itself (see
 // vite.config.js) so nothing else has to be running; in a build it's the API's /logos route.
 const LOGOS = import.meta.env.DEV ? "/logos" : `${import.meta.env.VITE_API_URL || "/api"}/logos`;
 const SAMPLE = 24;
 const HUE_BINS = 24;
-const tints = new Map();
+const reads = new Map();
 
 const sampleUrl = (logo) =>
   {
@@ -225,10 +225,14 @@ const vivid = (r, g, b) =>
     return `${Math.round(r)} ${Math.round(g)} ${Math.round(b)}`;
   };
 
-export const tintOf = (logo) =>
+// The logo's pixels, shrunk to SAMPLE x SAMPLE, or null when they can't be read. Both the tint and the tile come from
+// this one read. A read that hangs gives up after READ_WAIT, so a logo waiting on its tile is never hidden for long.
+const READ_WAIT = 3000;
+
+const pixelsOf = (logo) =>
   {
     if(!logo) return Promise.resolve(null);
-    if(tints.has(logo)) return tints.get(logo);
+    if(reads.has(logo)) return reads.get(logo);
 
     const url = sampleUrl(logo);
     const promise = !url
@@ -247,17 +251,69 @@ export const tintOf = (logo) =>
                     canvas.height = SAMPLE;
                     const context = canvas.getContext("2d", { willReadFrequently: true });
                     context.drawImage(image, 0, 0, SAMPLE, SAMPLE);
-                    resolve(dominantColour(context.getImageData(0, 0, SAMPLE, SAMPLE).data));
+                    resolve(context.getImageData(0, 0, SAMPLE, SAMPLE).data);
                   }
                 catch
                   {
-                    // A tainted canvas throws on read. No colour, the card falls back to cream.
+                    // A tainted canvas throws on read. Nothing to go on, so no colour and no tile.
                     resolve(null);
                   }
               };
             image.src = url;
+            setTimeout(() => resolve(null), READ_WAIT);
           });
 
-    tints.set(logo, promise);
+    reads.set(logo, promise);
     return promise;
   };
+
+// Brand colour, for the card hover: an "r g b" triple for a CSS custom property, or null when the logo is monochrome,
+// missing, or can't be read.
+export const tintOf = (logo) => pixelsOf(logo).then((pixels) => (pixels ? dominantColour(pixels) : null));
+
+// Share of the logo's outer ring that has to be see-through before it counts as having no background of its own.
+const CLEAR_EDGE = 0.3;
+
+// Above this average brightness a mark is light, white or nearly, and would vanish on a white tile.
+const LIGHT_MARK = 0.7;
+
+// How see-through the logo's outer ring of pixels is, from 0 (solid all round) to 1 (nothing there).
+const clearEdge = (pixels) =>
+  {
+    let edge = 0;
+    let clear = 0;
+    for(let y = 0; y < SAMPLE; y++)
+      {
+        for(let x = 0; x < SAMPLE; x++)
+          {
+            if(x !== 0 && y !== 0 && x !== SAMPLE - 1 && y !== SAMPLE - 1) continue;
+            edge++;
+            if(pixels[(y * SAMPLE + x) * 4 + 3] < 128) clear++;
+          }
+      }
+    return clear / edge;
+  };
+
+// Average brightness of the mark itself, its solid pixels only, from 0 (black) to 1 (white).
+const markLightness = (pixels) =>
+  {
+    let total = 0;
+    let solid = 0;
+    for(let i = 0; i < pixels.length; i += 4)
+      {
+        if(pixels[i + 3] < 128) continue;
+        const [r, g, b] = [pixels[i], pixels[i + 1], pixels[i + 2]].map((channel) => toLinear(channel / 255));
+        total += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        solid++;
+      }
+    return solid ? total / solid : 0;
+  };
+
+// The tile a logo sits on, the way Vercel's and Notion's come with their own square. "light" (white) for a dark or
+// coloured mark, "dark" (black) for a light one, or null when the logo already fills its square or can't be read.
+export const tileOf = (logo) =>
+  pixelsOf(logo).then((pixels) =>
+    {
+      if(!pixels || clearEdge(pixels) < CLEAR_EDGE) return null;
+      return markLightness(pixels) > LIGHT_MARK ? "dark" : "light";
+    });

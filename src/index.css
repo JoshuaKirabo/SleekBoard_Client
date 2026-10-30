@@ -208,7 +208,7 @@ body
             stroke-dashoffset: 0;
          }
 
-      /* Only the letter tile has a fill to tint; a real logo sits bare on the card. */
+      /* Only the letter tile has a fill to tint. A logo keeps its own square or its white or black tile. */
       .job-card:hover .company-mark[data-fallback]
          {
             background-color: color-mix(in oklab, var(--color-raised) 45%, rgb(var(--tint)));
