@@ -1,5 +1,6 @@
 import { statusById, shortDate } from "./statuses.js";
 import CompanyMark from "./CompanyMark.jsx";
+import { contactsStore } from "./contacts/ContactsStore.js";
 
 const COLUMNS = ["Company", "Role", "Location", "Status", "Applied", "Deadline", "Contact"];
 
@@ -8,7 +9,8 @@ const COLUMNS = ["Company", "Role", "Location", "Status", "Applied", "Deadline",
 const headFill = "bg-[color-mix(in_srgb,var(--color-canvas)_40%,var(--color-surface))]";
 
 // Same list as the board, laid flat. Clicking a row opens the same panel the cards do. Like the board it stays inside
-// the window: a long list scrolls under a pinned header row instead of pushing the page down.
+// the window: a long list scrolls under a pinned header row instead of pushing the page down. Pointing at a row starts
+// loading its contacts, the same head start the cards give the panel.
 export default function JobTable({ jobs, selectedId, onOpen })
   {
     return (
@@ -31,6 +33,7 @@ export default function JobTable({ jobs, selectedId, onOpen })
                   <tr
                     key={job.id}
                     onClick={() => onOpen(job.id)}
+                    onPointerEnter={() => contactsStore.warm(job.id)}
                     className={`cursor-pointer transition-colors duration-100 hover:bg-raised active:bg-raised ${selected ? "bg-raised" : ""}`}
                   >
                     <td className="h-13 px-4 pl-5">

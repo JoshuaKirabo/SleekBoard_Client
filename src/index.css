@@ -418,6 +418,13 @@ body
          }
    }
 
+/* A loading line that only shows once a wait has gone on long enough to notice. Anything that lands sooner replaces it
+   before it ever appears. */
+.late-reveal
+   {
+      animation: fade-in 200ms ease-out 400ms backwards;
+   }
+
 @media (prefers-reduced-motion: reduce)
    {
       .count-hop,

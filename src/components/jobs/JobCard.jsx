@@ -5,6 +5,7 @@ import CompanyMark from "./CompanyMark.jsx";
 import { logoFor } from "./logos.js";
 import useLogoTint from "./useLogoTint.js";
 import { DRAWER_ID } from "./statuses.js";
+import { contactsStore } from "./contacts/ContactsStore.js";
 
 // Deadline reads as how many days are left, since that's what you actually act on. Past ones just show the date.
 const deadlineLabel = (iso) =>
@@ -228,12 +229,18 @@ export default function JobCard({ job, selected, fresh, still = false, onOpen, o
         onOpen(job.id);
       };
 
+    // The pointer reaching the card (or the keyboard landing on it) is a good sign the panel is next, so its contacts
+    // start loading now instead of after it opens.
+    const warmContacts = () => contactsStore.warm(job.id);
+
     return (
       <div ref={wrapper} className={`relative ${fresh ? "card-rise" : ""} ${lifted ? "z-20 pointer-events-none" : ""}`}>
         <button
           type="button"
           onClick={onClick}
           onPointerDown={onPointerDown}
+          onPointerEnter={warmContacts}
+          onFocus={warmContacts}
           aria-pressed={selected}
           style={tint ? { "--tint": tint } : undefined}
           className={`job-card group w-full rounded-xl ${still ? "cursor-pointer" : "cursor-grab"} p-3.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream ${lifted ? "is-lifted scale-[1.03] cursor-grabbing bg-raised shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]" : "active:scale-[0.985]"} ${selected ? "bg-raised" : "bg-surface"}`}
