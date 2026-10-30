@@ -11,18 +11,18 @@ export function PersonName({ name, link, className = "font-medium text-ink" })
     return <a href={href} target="_blank" rel="noreferrer" className={`${className} underline-offset-2 hover:underline`}>{name}</a>;
   }
 
-// The role pill takes the board's status scale, so who to approach first stands out: cream for the recruiter, Board
-// Blue for whoever runs the team, and plain grey for everyone else.
-const PILL_TONES =
+// What the person is to you, as tinted text leading the line under their name, not a chip beside it (Josh,
+// 2026-10-30). The tints follow the board's status scale, so who to approach first still stands out: cream for the
+// recruiter, Board Blue for whoever runs the team, and plain grey for everyone else.
+const ROLE_TONES =
   {
-    recruiter: "bg-cream/[0.24] text-cream",
-    hiring_manager: "bg-board-light/70 text-board-bright",
+    recruiter: "text-cream",
+    hiring_manager: "text-board-bright",
   };
 
-function RolePill({ type })
+function RoleWord({ type })
   {
-    const tone = PILL_TONES[type] || "bg-raised text-ink-3";
-    return <span className={`inline-flex h-5 shrink-0 items-center rounded-full px-2 text-[11px] font-medium ${tone}`}>{KIND_LABELS[type] || "Contact"}</span>;
+    return <span className={`font-medium ${ROLE_TONES[type] || "text-ink-2"}`}>{KIND_LABELS[type] || "Contact"}</span>;
   }
 
 // "LinkedIn" for a LinkedIn page, otherwise the site's own name, for the proof line.
@@ -100,11 +100,11 @@ export default function Suggestion({ contact, onDecide, pending = false, classNa
 
     return (
       <li className={`rounded-2xl bg-canvas px-4.5 py-4 transition-opacity duration-300 ease-out-strong ${passed ? "opacity-55" : ""} ${className}`} style={style}>
-        <div className="flex items-center gap-2">
-          <PersonName name={contact.name} link={contact.link} className="truncate text-[15px] font-semibold tracking-[-0.01em] text-ink" />
-          <RolePill type={contact.type} />
-        </div>
-        <p className="mt-1 text-[13px] text-ink-3">{[contact.title, place].filter(Boolean).join(" · ")}</p>
+        <PersonName name={contact.name} link={contact.link} className="inline-block max-w-full truncate align-top text-[15px] font-semibold tracking-[-0.01em] text-ink" />
+        <p className="mt-1 text-[13px] text-ink-3">
+          <RoleWord type={contact.type} />
+          {[contact.title, place].filter(Boolean).map((part) => ` · ${part}`).join("")}
+        </p>
         {contact.reason && <p className="mt-3 text-[13.5px] leading-relaxed text-ink-2">{contact.reason}</p>}
         <Proof contact={contact} />
         {contact.decision
