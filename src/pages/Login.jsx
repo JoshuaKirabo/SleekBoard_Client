@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import mark from "../assets/brand/mark-white.svg";
 import LoginForm from "../components/login/LoginForm.jsx";
-import CreateAccountLink from "../components/login/CreateAccountLink.jsx";
+import SignUpForm from "../components/login/SignUpForm.jsx";
+import AccountSwitch from "../components/login/AccountSwitch.jsx";
 import SignInProblem from "../components/login/SignInProblem.jsx";
 import FeaturePanel from "../components/login/FeaturePanel.jsx";
 import useFitHeight from "../components/login/useFitHeight.js";
@@ -9,8 +10,9 @@ import useFitHeight from "../components/login/useFitHeight.js";
 // The login screen, laid out after the reference shot. It sits outside the app layout, so no sidebar or header, and
 // fills the whole window. The form sits on the left and what SleekBoard does on the right. Below lg that side drops
 // away and the form has the screen to itself. The page is exactly one window tall and never scrolls (Josh): the form's
-// sizes fit a laptop window, and a shorter one shrinks the card to fit.
-export default function Login()
+// sizes fit a laptop window, and a shorter one shrinks the card to fit. /signup shows the sign-up form in the same frame;
+// each form has its own sizes, fitted to its own fields, so changing one never changes the other.
+export default function Login({ signUp = false })
   {
     const column = useRef(null);
     const card = useRef(null);
@@ -25,11 +27,11 @@ export default function Login()
           <div
             ref={card}
             style={scale < 1 ? { transform: `scale(${scale})` } : undefined}
-            className="mx-auto mt-[clamp(20px,8vh,80px)] w-full max-w-[388px] origin-top"
+            className={`mx-auto w-full max-w-[388px] origin-top ${signUp ? "mt-[clamp(16px,5vh,64px)]" : "mt-[clamp(20px,8vh,80px)]"}`}
           >
-            <LoginForm />
-            <CreateAccountLink />
-            <SignInProblem />
+            {signUp ? <SignUpForm /> : <LoginForm />}
+            <AccountSwitch signUp={signUp} />
+            {!signUp && <SignInProblem />}
           </div>
         </main>
 

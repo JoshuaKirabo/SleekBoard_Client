@@ -2,11 +2,20 @@ import { GoogleMark } from "./brandIcons.jsx";
 import { googleSignInUrl } from "../../services/api.js";
 
 // The one other way in. The light and edge on hover and press live in index.css under .google-signin.
-// Pressing it leaves for the server's sign-in link, which goes on to Google. Only the owner's email gets through.
-export default function GoogleSignIn()
+// Two fits: the login page's, and a compact one for the sign-up page, whose four fields leave less room.
+const FITS =
   {
+    regular: { button: "h-12 text-base", radius: 24 },
+    compact: { button: "h-11 text-[15px]", radius: 22 },
+  };
+
+// Pressing it leaves for the server's sign-in link, which goes on to Google. Only the owner's email gets through. The
+// sign-up page passes its own label and the compact fit; the trip to Google is the same.
+export default function GoogleSignIn({ label = "Log in with Google", compact = false })
+  {
+    const fit = compact ? FITS.compact : FITS.regular;
     return (
-      <button type="button" onClick={() => window.location.assign(googleSignInUrl)} className="google-signin flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-full text-base font-medium">
+      <button type="button" onClick={() => window.location.assign(googleSignInUrl)} className={`google-signin flex ${fit.button} w-full cursor-pointer items-center justify-center gap-3 rounded-full font-medium`}>
         {/* Four pools of light in the G's colours, behind the label. Styled in index.css under .google-glow. */}
         <span className="google-glow" aria-hidden="true">
           <span />
@@ -26,11 +35,11 @@ export default function GoogleSignIn()
             </linearGradient>
           </defs>
           <g>
-            <rect width="100%" height="100%" rx="24" ry="24" fill="none" stroke="url(#google-edge-colours)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+            <rect width="100%" height="100%" rx={fit.radius} ry={fit.radius} fill="none" stroke="url(#google-edge-colours)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
           </g>
         </svg>
         <GoogleMark className="size-5" />
-        Log in with Google
+        {label}
       </button>
     );
   }
