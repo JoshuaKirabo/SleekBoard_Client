@@ -1,5 +1,6 @@
 import mark from "../assets/brand/mark-white.svg";
 import LoginForm from "../components/login/LoginForm.jsx";
+import SignInProblem from "../components/login/SignInProblem.jsx";
 import FeaturePanel from "../components/login/FeaturePanel.jsx";
 
 // The login screen, laid out after the reference shot. It sits outside the app layout, so no sidebar or header, and
@@ -13,6 +14,7 @@ export default function Login()
           <img src={mark} alt="SleekBoard" className="h-[22px] w-auto self-start" />
           <div className="mx-auto my-auto w-full max-w-[388px] pt-14 lg:pt-0">
             <LoginForm />
+            <SignInProblem />
           </div>
         </section>
 

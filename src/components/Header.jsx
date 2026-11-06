@@ -1,14 +1,19 @@
 import { SettingsIcon, BellIcon } from "./icons.jsx";
 import ProfileMenu from "./ProfileMenu.jsx";
+import { useSession, initialsOf } from "./auth/session.js";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 const roundButton = `inline-flex h-9 cursor-pointer items-center justify-center rounded-full text-ink-2 transition-colors duration-150 hover:text-ink ${focusRing}`;
 
-// Placeholder account, same as the reference screen, until real sign-in lands.
-const user = { name: "Udochukwu Chimbo", email: "Chimboudo@gmail.com", initials: "UC", unread: 2 };
+// Placeholder count, same as the reference screen, until notifications exist.
+const UNREAD = 2;
 
 export default function Header({ title })
   {
+    // The signed-in account. A Google profile with no name shows the email in its place.
+    const session = useSession();
+    const user = { name: session.name || session.email, email: session.email || "", initials: initialsOf(session), unread: UNREAD };
+
     return (
       <header className="flex h-[76px] shrink-0 items-center justify-between border-b border-line px-5 sm:px-7">
         <h1 className="text-[22px] font-semibold tracking-tight sm:text-2xl">{title}</h1>

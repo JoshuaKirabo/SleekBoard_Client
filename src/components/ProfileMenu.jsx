@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDownIcon, LogOutIcon } from "./icons.jsx";
 import useScreenSwap from "./useScreenSwap.js";
+import { signOut } from "../services/api.js";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
@@ -22,8 +23,20 @@ export default function ProfileMenu({ user })
         if(refocus) trigger.current?.focus();
       };
 
-    // There's no session to clear yet, so for now logging out just takes you back to the login screen.
-    const logOut = () => swap("/login", "out");
+    // Ends the session on the server, then plays the swap back to the login screen. If the server can't be reached,
+    // you still go: the next page you open will ask it again.
+    const logOut = async () =>
+      {
+        try
+          {
+            await signOut();
+          }
+        catch(error)
+          {
+            console.warn("Couldn't end the session on the server:", error.message);
+          }
+        swap("/login", "out");
+      };
 
     // The one item takes focus as soon as the menu opens, so Enter right after opening logs you out.
     useEffect(() =>

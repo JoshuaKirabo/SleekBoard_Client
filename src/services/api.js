@@ -11,6 +11,31 @@ export const getHealth = async () =>
 // A failed request as one sentence to show. The server sends its own message; no reply at all means it isn't up.
 export const problemOf = (error) => error.response?.data?.message || "Couldn't reach the SleekBoard server.";
 
+// Sign-in. Starting is a plain link, like Gmail's: the server sends you to Google, and Google sends you back to the
+// board, or to /login?signin=error&reason=….
+export const googleSignInUrl = `${import.meta.env.VITE_API_URL || ""}/auth/google`;
+
+// Who's signed in, as { id, email, name }, or null when nobody is.
+export const getMe = async () =>
+  {
+    try
+      {
+        const { data } = await http.get("/auth/me");
+        return data.user;
+      }
+    catch(error)
+      {
+        if(error.response?.status === 401) return null;
+        throw error;
+      }
+  };
+
+// Ends the session on the server. The cookie goes with it.
+export const signOut = async () =>
+  {
+    await http.post("/auth/logout");
+  };
+
 // The board's jobs, saved in Mongo. Each one hands back the server's copy, so the id is always Mongo's.
 
 // Every job, most recently touched first.
