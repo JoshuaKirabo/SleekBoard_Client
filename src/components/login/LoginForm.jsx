@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import GoogleSignIn from "./GoogleSignIn.jsx";
 import useScreenSwap from "../useScreenSwap.js";
+import { logIn, problemOf } from "../../services/api.js";
+import { safeNext } from "../auth/nextPath.js";
 import wordmark from "../../assets/brand/wordmark-white.svg";
 
 const labelClass = "block pl-3 text-base text-ink-2";
@@ -16,14 +19,26 @@ export default function LoginForm()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [keepLoggedIn, setKeepLoggedIn] = useState(true);
+    const [problem, setProblem] = useState("");
+    const [params] = useSearchParams();
 
     const swap = useScreenSwap();
 
-    // There's no account check yet, so Sign in walks you straight into the app. That way the way in and out can be tried.
-    const handleSubmit = (event) =>
+    // Checks the email and password with the server, then walks into the page you were sent here from (?next=), as
+    // long as it's one of the board's own. If it didn't work, the server's reason shows under the form.
+    const handleSubmit = async (event) =>
       {
         event.preventDefault();
-        swap("/", "in");
+        setProblem("");
+        try
+          {
+            await logIn({ email, password, remember: keepLoggedIn });
+          }
+        catch(error)
+          {
+            return setProblem(problemOf(error));
+          }
+        swap(safeNext(params.get("next")), "in");
       };
 
     return (
@@ -83,6 +98,8 @@ export default function LoginForm()
         <div className="mt-7">
           <GoogleSignIn />
         </div>
+
+        {problem && <p role="alert" className="mt-6 pl-3 text-sm leading-relaxed text-ink-2">{problem}</p>}
       </form>
     );
   }

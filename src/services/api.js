@@ -30,6 +30,14 @@ export const getMe = async () =>
       }
   };
 
+// Email + password sign-in for an account that already has a password. remember keeps you signed in for 30 days;
+// without it the session ends when the browser closes. Gives back the user, or throws with the server's message.
+export const logIn = async ({ email, password, remember }) =>
+  {
+    const { data } = await http.post("/auth/login", { email, password, remember });
+    return data.user;
+  };
+
 // Ends the session on the server. The cookie goes with it.
 export const signOut = async () =>
   {
