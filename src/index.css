@@ -560,3 +560,118 @@ body
             animation: well-glow 1.6s var(--ease-soft) infinite alternate;
          }
    }
+
+/* Screen swap, between the login screen and the app (see useScreenSwap). Think of the login screen as a door in
+   front of the app. Logging out, the app sinks back and the door settles into place from just in front of you.
+   Logging in plays the mirror: the door lifts toward you as it fades and the app rises up from behind it. The
+   screen you're leaving goes quicker than the new one arrives, so the two never sit on top of each other for long. */
+::view-transition
+   {
+      background: var(--color-canvas);
+   }
+
+html[data-swap]::view-transition-old(root), html[data-swap]::view-transition-new(root)
+   {
+      mix-blend-mode: normal;
+      animation-timing-function: var(--ease-out-strong);
+      animation-fill-mode: both;
+   }
+
+html[data-swap]::view-transition-old(root)
+   {
+      animation-duration: 200ms;
+   }
+
+html[data-swap]::view-transition-new(root)
+   {
+      animation-duration: 280ms;
+   }
+
+html[data-swap="out"]::view-transition-old(root)
+   {
+      animation-name: swap-sink;
+   }
+
+html[data-swap="out"]::view-transition-new(root)
+   {
+      animation-name: swap-from-front;
+   }
+
+html[data-swap="in"]::view-transition-old(root)
+   {
+      animation-name: swap-lift;
+   }
+
+html[data-swap="in"]::view-transition-new(root)
+   {
+      animation-name: swap-from-back;
+   }
+
+@keyframes swap-sink
+   {
+      to
+         {
+            opacity: 0;
+            transform: scale(0.97);
+         }
+   }
+
+@keyframes swap-lift
+   {
+      to
+         {
+            opacity: 0;
+            transform: scale(1.03);
+         }
+   }
+
+@keyframes swap-from-front
+   {
+      from
+         {
+            opacity: 0;
+            transform: scale(1.03);
+         }
+   }
+
+@keyframes swap-from-back
+   {
+      from
+         {
+            opacity: 0;
+            transform: scale(0.97);
+         }
+   }
+
+@keyframes swap-fade-out
+   {
+      to
+         {
+            opacity: 0;
+         }
+   }
+
+@keyframes swap-fade-in
+   {
+      from
+         {
+            opacity: 0;
+         }
+   }
+
+/* With reduced motion the screens just cross-fade, no scaling. The catch-all rule near the top of this file doesn't
+   reach these, because view transition layers aren't elements. */
+@media (prefers-reduced-motion: reduce)
+   {
+      html[data-swap]::view-transition-old(root)
+         {
+            animation-name: swap-fade-out;
+            animation-duration: 150ms;
+         }
+
+      html[data-swap]::view-transition-new(root)
+         {
+            animation-name: swap-fade-in;
+            animation-duration: 150ms;
+         }
+   }

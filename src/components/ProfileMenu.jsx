@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDownIcon, LogOutIcon } from "./icons.jsx";
+import useScreenSwap from "./useScreenSwap.js";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
@@ -13,6 +14,7 @@ export default function ProfileMenu({ user })
     const trigger = useRef(null);
     const item = useRef(null);
     const id = useId();
+    const swap = useScreenSwap();
 
     const close = (refocus = true) =>
       {
@@ -20,8 +22,8 @@ export default function ProfileMenu({ user })
         if(refocus) trigger.current?.focus();
       };
 
-    // Nothing to sign out of yet. Once login lands this clears the session and sends you to the login screen.
-    const logOut = () => close();
+    // There's no session to clear yet, so for now logging out just takes you back to the login screen.
+    const logOut = () => swap("/login", "out");
 
     // The one item takes focus as soon as the menu opens, so Enter right after opening logs you out.
     useEffect(() =>
