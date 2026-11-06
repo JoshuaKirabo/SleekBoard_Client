@@ -67,7 +67,7 @@ export default function ProfileMenu({ user })
 
     return (
       <div ref={root} className="relative ml-1">
-        {/* Shrinks a touch the moment you press, so it answers before the menu has even started to open. */}
+        {/* Stays put when pressed. The menu dropping open under it is the answer. */}
         <button
           ref={trigger}
           type="button"
@@ -78,7 +78,7 @@ export default function ProfileMenu({ user })
           data-open={open}
           onClick={() => (open ? close() : setOpen(true))}
           onKeyDown={onTriggerKey}
-          className={`flex cursor-pointer items-center gap-2.5 rounded-full py-1 pr-2.5 pl-1 text-left transition-[background-color,scale] duration-150 ease-out-strong hover:bg-raised/70 active:scale-[0.97] data-[open=true]:bg-raised/70 ${focusRing}`}
+          className={`flex cursor-pointer items-center gap-2.5 rounded-full py-1 pr-2.5 pl-1 text-left transition-[background-color] duration-150 ease-out-strong hover:bg-raised/70 data-[open=true]:bg-raised/70 ${focusRing}`}
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cream text-[12px] font-semibold text-surface" aria-hidden="true">{user.initials}</span>
           <span className="hidden leading-tight sm:block">
@@ -88,15 +88,17 @@ export default function ProfileMenu({ user })
           <ChevronDownIcon size={14} className={`shrink-0 text-ink-3 transition-transform duration-200 ease-out-strong ${open ? "rotate-180" : ""}`} />
         </button>
 
-        {/* Grows out of the corner under the avatar, so it reads as coming from what you clicked. Same scale and
-            curve as the status menu on the board, and it leaves faster than it arrives. */}
+        {/* Drops open from its top edge like a blind unrolling, settling down a few pixels as it comes into focus.
+            The clip runs wide at the sides and bottom so the shadow isn't cut off once it's open. Closing lifts it
+            back the way it came, quicker than it arrived. Transitions, so a fast second click turns it straight
+            round. With reduced motion it only fades. */}
         <div
           id={`${id}-menu`}
           role="menu"
           aria-label="Account"
           inert={!open}
           onKeyDown={onMenuKey}
-          className={`absolute top-full right-0 z-30 mt-2 min-w-[176px] origin-top-right rounded-[14px] bg-raised p-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.3),0_18px_40px_-12px_rgba(0,0,0,0.65)] transition-[opacity,scale] ease-out-strong ${open ? "scale-100 opacity-100 duration-150" : "pointer-events-none scale-[0.96] opacity-0 duration-[110ms]"}`}
+          className={`absolute top-full right-0 z-30 mt-2 min-w-[176px] origin-top-right rounded-[14px] bg-raised p-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.3),0_18px_40px_-12px_rgba(0,0,0,0.65)] transition-[opacity,translate,clip-path,filter] ease-out-strong motion-reduce:transition-opacity ${open ? "translate-y-0 opacity-100 blur-none duration-[260ms] [clip-path:inset(-24px_-32px_-56px_-32px)]" : "pointer-events-none -translate-y-1.5 opacity-0 blur-[3px] duration-150 [clip-path:inset(-24px_-32px_100%_-32px)] motion-reduce:translate-y-0 motion-reduce:blur-none"}`}
         >
           <button
             ref={item}
