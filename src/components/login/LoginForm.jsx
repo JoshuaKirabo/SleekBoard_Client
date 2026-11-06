@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SocialSignIn from "./SocialSignIn.jsx";
+import GoogleSignIn from "./GoogleSignIn.jsx";
 import useScreenSwap from "../useScreenSwap.js";
 import wordmark from "../../assets/brand/wordmark-white.svg";
 
@@ -73,8 +73,15 @@ export default function LoginForm()
           Sign in
         </button>
 
-        <div className="mt-10">
-          <SocialSignIn />
+        {/* OR between the two ways in, on lines that fade out toward the edges so they don't read as hard rules. */}
+        <div className="mt-7 flex items-center gap-4" aria-hidden="true">
+          <span className="h-px flex-1 bg-linear-to-l from-line-strong to-transparent" />
+          <span className="text-xs font-medium tracking-[0.14em] text-ink-3">OR</span>
+          <span className="h-px flex-1 bg-linear-to-r from-line-strong to-transparent" />
+        </div>
+
+        <div className="mt-7">
+          <GoogleSignIn />
         </div>
       </form>
     );

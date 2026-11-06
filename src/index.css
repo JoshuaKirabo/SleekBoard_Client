@@ -638,60 +638,68 @@ body
       outline-offset: 3px;
    }
 
-/* The sign-in coins never move. Pointing at one fills it with its provider's colour and turns the logo white, and
-   pressing deepens the colour a step. Everything is a colour fade: in a little quicker than out, so it answers you
-   but never snaps. Each coin brings its own --brand. */
-.social-coin
+/* Log in with Google sits in the same well colour as the fields, a step below Sign in. It never moves. Pointing at it
+   lifts the well a step and fades in light from the bottom edge in the G's own four colours, the way a job card lights
+   up from below. The G keeps its colours, as Google asks. Pressing dims the light. Every change is an opacity or
+   colour fade on the gentle-both-ways curve, slow enough that the light glides in and drifts back out. */
+.google-signin
    {
-      --brand: #dbd8ce;
-      --fill: #ffffff;
-      background-color: var(--fill);
-      box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.45);
-      transition: background-color 320ms ease;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background-color: var(--color-surface);
+      color: var(--color-ink);
+      transition: background-color 720ms var(--ease-soft);
    }
 
-.social-coin path
+.google-signin::before
    {
-      transition: fill 320ms ease;
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+         radial-gradient(34% 120% at 14% 130%, rgb(66 133 244 / 0.5) 0%, transparent 70%),
+         radial-gradient(34% 120% at 38% 130%, rgb(234 67 53 / 0.42) 0%, transparent 70%),
+         radial-gradient(34% 120% at 62% 130%, rgb(251 188 5 / 0.38) 0%, transparent 70%),
+         radial-gradient(34% 120% at 86% 130%, rgb(52 168 83 / 0.44) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 720ms var(--ease-soft);
    }
 
 @media (hover: hover) and (pointer: fine)
    {
-      .social-coin:hover
+      .google-signin:hover
          {
-            --fill: var(--brand);
-            transition-duration: 240ms;
+            background-color: var(--color-raised);
+            transition-duration: 560ms;
          }
 
-      .social-coin:hover path
+      .google-signin:hover::before
          {
-            fill: #ffffff;
-            transition-duration: 240ms;
-         }
-
-      /* Facebook's f is cut out of its circle, so on a filled coin it takes the coin's colour. */
-      .social-coin:hover .mark-cut
-         {
-            fill: var(--fill);
+            opacity: 1;
+            transition-duration: 560ms;
          }
    }
 
-/* After the hover rules so a press wins over them. Touch screens have no hover, so a tap goes straight to this. */
-.social-coin:active
+/* After the hover rules so a press wins over them. Touch screens have no hover, so a tap shows the dimmed light. */
+.google-signin:active
    {
-      --fill: color-mix(in oklab, var(--brand) 80%, black);
-      transition-duration: 160ms;
+      background-color: var(--color-surface);
+      transition-duration: 220ms;
    }
 
-.social-coin:active path
+.google-signin:active::before
    {
-      fill: #ffffff;
-      transition-duration: 160ms;
+      opacity: 0.55;
+      transition-duration: 220ms;
    }
 
-.social-coin:active .mark-cut
+.google-signin:focus-visible
    {
-      fill: var(--fill);
+      outline: 2px solid var(--color-cream);
+      outline-offset: 3px;
    }
 
 /* The feature panel wears the dashboard Insight card's Board Blue, lit from the top left, with a little blue
