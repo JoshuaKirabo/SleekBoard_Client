@@ -1,21 +1,17 @@
 import { SEASONS, YEARS } from "../huntOptions.js";
-import { focusRing, well } from "./styles.js";
+import SelectMenu from "../../SelectMenu.jsx";
+import { selectWell } from "./styles.js";
 
-const select = `${well} h-11 w-full cursor-pointer px-3.5 text-[14.5px] focus:bg-board-deep focus:outline-none ${focusRing}`;
+const YEAR_OPTIONS = [{ value: "", label: "Any year" }, ...YEARS.map((year) => ({ value: year, label: year }))];
+const SEASON_OPTIONS = [{ value: "", label: "Any season" }, ...SEASONS.map((season) => ({ value: season, label: season }))];
 
 // A year and a season, for when you can start or when you graduate. Either one can stay "Any".
 export default function WhenField({ label, value, onChange })
   {
     return (
       <div className="grid grid-cols-2 gap-2">
-        <select value={value.year} onChange={(event) => onChange({ ...value, year: event.target.value })} aria-label={`${label} year`} className={select}>
-          <option value="">Any year</option>
-          {YEARS.map((year) => <option key={year} value={year}>{year}</option>)}
-        </select>
-        <select value={value.season} onChange={(event) => onChange({ ...value, season: event.target.value })} aria-label={`${label} season`} className={select}>
-          <option value="">Any season</option>
-          {SEASONS.map((season) => <option key={season} value={season}>{season}</option>)}
-        </select>
+        <SelectMenu value={value.year} options={YEAR_OPTIONS} onChange={(year) => onChange({ ...value, year })} label={`${label} year`} labelTrigger trigger={selectWell} />
+        <SelectMenu value={value.season} options={SEASON_OPTIONS} onChange={(season) => onChange({ ...value, season })} label={`${label} season`} labelTrigger trigger={selectWell} />
       </div>
     );
   }

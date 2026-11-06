@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { POSTED_PRESETS } from "../huntOptions.js";
-import { focusRing, well, pill } from "./styles.js";
+import SelectMenu from "../../SelectMenu.jsx";
+import { focusRing, well, pill, selectWellSmall } from "./styles.js";
+
+const UNITS = [{ value: "hours", label: "hours" }, { value: "days", label: "days" }];
 
 const same = (a, b) => a && b && a.amount === b.amount && a.unit === b.unit;
 
@@ -50,10 +53,7 @@ export default function PostedWithin({ value, onChange })
         {custom && (
           <span className="tag-pop flex items-center gap-2">
             <input type="number" min="1" max="999" value={customValue.amount} onChange={setAmount} aria-label="How many" className={`${well} h-10 w-20 px-3 text-[14px] focus:bg-board-deep focus:outline-none ${focusRing}`} />
-            <select value={customValue.unit} onChange={(event) => onChange({ ...customValue, unit: event.target.value })} aria-label="Hours or days" className={`${well} h-10 cursor-pointer px-3 text-[14px] focus:bg-board-deep focus:outline-none ${focusRing}`}>
-              <option value="hours">hours</option>
-              <option value="days">days</option>
-            </select>
+            <SelectMenu value={customValue.unit} options={UNITS} onChange={(unit) => onChange({ ...customValue, unit })} label="Hours or days" labelTrigger block={false} trigger={selectWellSmall} />
           </span>
         )}
       </div>
