@@ -1,16 +1,17 @@
 import { NavLink, Link } from "react-router-dom";
 import wordmark from "../assets/brand/wordmark-white.svg";
-import { GridIcon, ChatIcon, ResumeIcon, JobsIcon, HunterIcon, ApplicationIcon, ChartIcon } from "./icons.jsx";
+import { GridIcon, ChatIcon, ResumeIcon, JobsIcon, HunterIcon, ContactsIcon, ApplicationIcon, ChartIcon } from "./icons.jsx";
 
-// The reference screen's six items plus Job Hunter. Only Analytics has a page so far, the rest land on 404 until built.
+// The reference screen's six items plus Job Hunter and Contacts. Home and Jobs are built, the rest land on 404 until built.
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", Icon: GridIcon },
+  { to: "/", label: "Home", Icon: GridIcon },
   { to: "/chat", label: "Chat", Icon: ChatIcon },
   { to: "/resume", label: "Resume", Icon: ResumeIcon },
   { to: "/jobs", label: "Jobs", Icon: JobsIcon },
   { to: "/job-hunter", label: "Job Hunter", Icon: HunterIcon },
+  { to: "/contacts", label: "Contacts", Icon: ContactsIcon },
   { to: "/application", label: "Application", Icon: ApplicationIcon },
-  { to: "/", label: "Analytics", Icon: ChartIcon },
+  { to: "/analytics", label: "Analytics", Icon: ChartIcon },
 ];
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
@@ -33,7 +34,7 @@ export default function Sidebar()
       <aside className="flex w-full flex-col border-b border-line lg:w-[232px] lg:shrink-0 lg:border-r lg:border-b-0">
         {/* The logo row keeps its own bottom line so it meets the header's and the two dividers cross. */}
         <div className="flex h-[76px] shrink-0 items-center px-6 lg:border-b lg:border-line">
-          <Link to="/" aria-label="SleekBoard, go to Analytics" className={`rounded-sm ${focusRing}`}>
+          <Link to="/" aria-label="SleekBoard, go to Home" className={`rounded-sm ${focusRing}`}>
             <img src={wordmark} alt="" className="h-[17px] w-auto" />
           </Link>
         </div>

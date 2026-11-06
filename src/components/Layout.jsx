@@ -5,13 +5,14 @@ import Header from "./Header.jsx";
 // Header title per route. Unknown routes land on the 404 page, so they get that title.
 const TITLES =
   {
-    "/": "Analytics",
-    "/dashboard": "Dashboard",
+    "/": "Home",
     "/chat": "Chat",
     "/resume": "Resume",
     "/jobs": "Jobs",
     "/job-hunter": "Job Hunter",
+    "/contacts": "Contacts",
     "/application": "Application",
+    "/analytics": "Analytics",
   };
 
 // Pages that are held to the height of the window instead of growing past it. The jobs board is one: the whole
