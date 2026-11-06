@@ -1011,6 +1011,98 @@ html[data-swap="in"]::view-transition-new(root)
       mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%);
    }
 
+/* The preferences popup is the roles box opened up, so it grows out of that box and shrinks back into it
+   (components/hunter/HuntPreferences.jsx). The panel never moves or scales, which would squash its text: a clip
+   outline starts on the box's edges (--from-*, measured each time) and opens out to the panel's own. The two share
+   bg-surface, so it reads as one box getting bigger. */
+
+/* The page frosts and dims behind it. Only the opacity moves, never the blur, so the fade stays cheap. */
+.hunt-backdrop
+   {
+      background: rgb(0 0 0 / 0.5);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transition: opacity 280ms var(--ease-out-strong);
+   }
+
+.hunt-backdrop[data-state="open"]
+   {
+      opacity: 1;
+      transition-duration: 320ms;
+   }
+
+/* Open: the outline runs out past every edge so the drop shadow isn't cut: 30px above, 70px each side, 110px below.
+   Its corners are that far out too, so the panel's own rounded corners are the ones you see. The panel fades up
+   over the box in its first 100ms, so your roles melt away under it instead of blinking out. */
+.hunt-panel
+   {
+      clip-path: inset(-30px -70px -110px -70px round 28px);
+      transition:
+         clip-path 420ms var(--ease-out-strong),
+         opacity 100ms linear;
+   }
+
+/* Leaving: the contents go first, then the outline closes back onto the box and the panel fades off it, so the box
+   with your roles is what's left. Without a box to aim at, it closes toward the middle. */
+.hunt-panel[data-state="leaving"],
+.hunt-panel[data-state="rest"]
+   {
+      clip-path: inset(var(--from-top, 30%) var(--from-right, 25%) var(--from-bottom, 30%) var(--from-left, 25%) round 24px);
+   }
+
+.hunt-panel[data-state="leaving"]
+   {
+      opacity: 0;
+      transition:
+         clip-path 320ms var(--ease-out-strong),
+         opacity 120ms linear 200ms;
+   }
+
+.hunt-panel[data-state="leaving"] > *
+   {
+      opacity: 0;
+      transition: opacity 100ms linear;
+   }
+
+.hunt-panel[data-state="rest"]
+   {
+      opacity: 0;
+      visibility: hidden;
+      transition: none;
+   }
+
+/* The contents settle in once the outline has mostly opened, a short beat apart. Fill is backwards only so the
+   transform lets go once a block lands. */
+@keyframes hunt-content-in
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(8px);
+         }
+   }
+
+.hunt-panel .rise
+   {
+      animation: hunt-content-in 280ms var(--ease-out-strong) backwards;
+      animation-delay: calc(150ms + var(--i, 0) * 40ms);
+   }
+
+/* Reduced motion: no growing out of the box and nothing sliding in. The popup and its shade simply fade. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .hunt-panel
+         {
+            clip-path: none !important;
+         }
+
+      .hunt-panel .rise
+         {
+            animation-name: none;
+         }
+   }
+
 /* A small cut of the card hug for the choice tiles: cream light rising from the bottom edge and a cream tint in the
    fill, on the same fast-start-long-settle curve. No stroke, there are too many tiles side by side for that. */
 .hunt-tile

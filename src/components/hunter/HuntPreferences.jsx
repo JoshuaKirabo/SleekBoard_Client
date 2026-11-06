@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CloseIcon } from "../icons.jsx";
 import { prefersReducedMotion } from "../jobs/spring.js";
 import { EMPTY_HUNT } from "./huntOptions.js";
@@ -9,6 +9,11 @@ import { focusRing } from "./fields/styles.js";
 const NAV_ITEM_PX = 48;
 // A section counts as the one you're reading once its title is above this share of the scroll area's height.
 const READING_LINE = 0.4;
+// How long the popup takes to shrink back into the roles box before it's put away (index.css, .hunt-panel).
+const LEAVE_MS = 340;
+// The roles field has settled in by about this point. Focusing it sooner would put the focus ring on something
+// still sliding into place.
+const FOCUS_AFTER_MS = 420;
 
 // Why Start hunting can't be pressed yet, in words, or nothing when it can.
 const whatsMissing = (hunt) =>
@@ -46,6 +51,70 @@ function usePageHeldBehind(open)
       }, [open]);
   }
 
+// Lays the popup's outline over the box it grows out of, as insets from the popup's own edges (index.css reads
+// them as --from-*). Without a box the insets come off and the CSS closes toward the middle instead.
+function pinOutlineTo(panel, box)
+  {
+    const sides = ["top", "right", "bottom", "left"];
+    if(!box)
+      {
+        sides.forEach((side) => panel.style.removeProperty(`--from-${side}`));
+        return;
+      }
+
+    const outer = panel.getBoundingClientRect();
+    const inner = box.getBoundingClientRect();
+    const insets = { top: inner.top - outer.top, right: outer.right - inner.right, bottom: outer.bottom - inner.bottom, left: inner.left - outer.left };
+    sides.forEach((side) => panel.style.setProperty(`--from-${side}`, `${insets[side]}px`));
+  }
+
+// Keeps the popup's outline on the roles box, measured fresh each time, since the page may have scrolled and saving
+// may have changed the box's size. A fresh open has to start from where the box is now, so it puts the panel back
+// at rest for one forced style pass with the new measurements before letting it open.
+function useGrowFromBox(state, panel, box)
+  {
+    const previous = useRef(state);
+
+    useLayoutEffect(() =>
+      {
+        const from = previous.current;
+        previous.current = state;
+        const node = panel.current;
+        if(!node || state === "rest") return;
+        pinOutlineTo(node, box?.current);
+        if(state !== "open" || from !== "rest") return;
+        node.dataset.state = "rest";
+        node.getBoundingClientRect();
+        node.dataset.state = "open";
+      }, [state, panel, box]);
+  }
+
+// Where the popup is in its motion: "open", "leaving" for the short exit after a close, or "rest" once it's hidden
+// and pinned back over the roles box. Leaving only follows an open, so the first load starts at rest.
+// The switch to leaving happens during the render that closes it, not in an effect after: one painted frame at rest
+// would snap the panel out of sight before the exit could start.
+function usePanelState(open)
+  {
+    const [wasOpen, setWasOpen] = useState(open);
+    const [leaving, setLeaving] = useState(false);
+
+    if(open !== wasOpen)
+      {
+        setWasOpen(open);
+        setLeaving(!open);
+      }
+
+    useEffect(() =>
+      {
+        if(!leaving) return;
+        const timer = setTimeout(() => setLeaving(false), LEAVE_MS);
+        return () => clearTimeout(timer);
+      }, [leaving]);
+
+    if(open) return "open";
+    return leaving ? "leaving" : "rest";
+  }
+
 // The section list down the left. A highlight slides behind the one you're reading; clicking one scrolls to it.
 function SectionNav({ hunt, active, onPick, rise })
   {
@@ -71,8 +140,9 @@ function SectionNav({ hunt, active, onPick, rise })
 
 // The big popup that holds everything the hunter needs to know. It works on a copy: Cancel or Escape drops your
 // changes, and only the main button hands them back. Opening and closing ride CSS transitions rather than keyframes,
-// so closing it mid-open turns it straight around instead of finishing the open first.
-export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave })
+// so closing it mid-open turns it straight around instead of finishing the open first. The motion itself lives in
+// index.css under .hunt-panel and .hunt-backdrop: it grows out of the roles box (origin) and shrinks back into it.
+export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave, origin })
   {
     const [draft, setDraft] = useState(hunt);
     const [session, setSession] = useState(0);
@@ -81,6 +151,9 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
     const rolesInput = useRef(null);
 
     usePageHeldBehind(open);
+    const panel = useRef(null);
+    const panelState = usePanelState(open);
+    useGrowFromBox(panelState, panel, origin);
 
     // A fresh copy and a fresh scroll each time it opens. The session number remounts the fields, so folds and
     // half-typed words from last time don't carry over.
@@ -91,8 +164,7 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
         setSession((count) => count + 1);
         setActive(SECTIONS[0].id);
         if(scroller.current) scroller.current.scrollTop = 0;
-        // Wait for the rise so the focus ring doesn't flash on the way up.
-        const timer = setTimeout(() => rolesInput.current?.focus(), 160);
+        const timer = setTimeout(() => rolesInput.current?.focus(), FOCUS_AFTER_MS);
         const onKey = (event) => event.key === "Escape" && onClose();
         window.addEventListener("keydown", onKey);
         return () =>
@@ -119,14 +191,15 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
 
     return (
       <div inert={!open} className={`fixed inset-0 z-40 flex items-end justify-center sm:items-center sm:p-6 ${open ? "" : "pointer-events-none"}`}>
-        <div onClick={onClose} className={`absolute inset-0 bg-black/60 transition-opacity ease-out-strong ${open ? "opacity-100 duration-300" : "opacity-0 duration-200"}`} aria-hidden="true" />
+        <div onClick={onClose} data-state={panelState} className="hunt-backdrop absolute inset-0" aria-hidden="true" />
 
-        {/* Tailwind v4 keeps translate and scale on their own CSS properties, so those are what get transitioned. */}
         <div
+          ref={panel}
           role="dialog"
           aria-modal="true"
           aria-labelledby="hunt-prefs-title"
-          className={`relative flex h-[94dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-surface shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] transition-[translate,scale,opacity] ease-out-strong sm:h-[min(820px,100%)] sm:max-w-[1080px] sm:rounded-[28px] ${open ? "translate-y-0 scale-100 opacity-100 duration-[420ms]" : "translate-y-6 scale-[0.97] opacity-0 duration-[260ms]"}`}
+          data-state={panelState}
+          className="hunt-panel relative flex h-[94dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-surface shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] sm:h-[min(820px,100%)] sm:max-w-[1080px] sm:rounded-[28px]"
         >
           <header className={`${rise} flex items-center justify-between px-7 pt-6 pb-5`} style={{ "--i": 0 }}>
             <h2 id="hunt-prefs-title" className="text-[26px] leading-none font-bold tracking-[-0.02em]">What should I hunt for?</h2>
@@ -145,8 +218,9 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
             </div>
           </div>
 
-          {/* The scroll area fades out above the footer, so there's no line across the popup. */}
-          <footer className="relative flex flex-wrap items-center justify-between gap-3 px-7 py-4">
+          {/* The scroll area fades out above the footer, so there's no line across the popup. The footer rises last,
+              so the buttons never show before the title. */}
+          <footer className={`${rise} relative flex flex-wrap items-center justify-between gap-3 px-7 py-4`} style={{ "--i": 3 }}>
             <div className="flex items-center gap-3 text-[13.5px]">
               <span className="text-ink-3 tabular-nums">{total ? `${total} picked` : "Nothing picked yet"}</span>
               {total > 0 && (

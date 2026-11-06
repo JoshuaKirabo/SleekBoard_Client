@@ -59,11 +59,11 @@ function NoRoles({ onAdd })
   }
 
 // The box under the hunter's message. It comes up once the hunter has finished talking: your roles if you have
-// some, an Add roles prompt if you don't.
-export default function RolesBox({ roles, details, onEdit, onHunt, hunting })
+// some, an Add roles prompt if you don't. The ref is for the preferences popup, which grows out of this box.
+export default function RolesBox({ ref, roles, details, onEdit, onHunt, hunting })
   {
     return (
-      <section className="hunt-rise w-full rounded-3xl bg-surface p-5 sm:p-7">
+      <section ref={ref} className="hunt-rise w-full rounded-3xl bg-surface p-5 sm:p-7">
         {roles.length > 0 ? <RolesList roles={roles} details={details} onEdit={onEdit} onHunt={onHunt} hunting={hunting} /> : <NoRoles onAdd={onEdit} />}
       </section>
     );

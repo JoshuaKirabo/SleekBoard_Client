@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import AgentMessage from "../components/hunter/AgentMessage.jsx";
 import RolesBox from "../components/hunter/RolesBox.jsx";
@@ -42,6 +42,8 @@ export default function JobHunter()
     const [hunt, setHunt] = useState(() => (import.meta.env.DEV && params.get("roles") === "sample" ? SAMPLE_HUNT : EMPTY_HUNT));
     const [editing, setEditing] = useState(false);
     const [hunting, setHunting] = useState(false);
+    // The roles box, which the preferences popup grows out of and shrinks back into.
+    const rolesBox = useRef(null);
 
     // The box waits for the line the hunter is on now. A new line (your first roles saved) hides it until that
     // line has typed out, so the box always comes up after the hunter, never under a half-typed message.
@@ -67,10 +69,10 @@ export default function JobHunter()
       <div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 pt-2 pb-10 sm:pt-6">
         {/* A new greeting remounts the message, so saving your first roles has the hunter answer with the next line. */}
         <AgentMessage key={greeting} text={greeting} onDone={finishSpeaking} />
-        {spoken && <RolesBox roles={hunt.roles} details={detailsOf(hunt)} onEdit={openEditor} onHunt={startHunt} hunting={hunting} />}
+        {spoken && <RolesBox ref={rolesBox} roles={hunt.roles} details={detailsOf(hunt)} onEdit={openEditor} onHunt={startHunt} hunting={hunting} />}
         {hunting && <HuntProgress hunt={hunt} onStop={stopHunt} />}
 
-        <HuntPreferences open={editing} hunt={hunt} firstTime={!hunt.roles.length} onClose={closeEditor} onSave={saveHunt} />
+        <HuntPreferences open={editing} hunt={hunt} firstTime={!hunt.roles.length} onClose={closeEditor} onSave={saveHunt} origin={rolesBox} />
       </div>
     );
   }
