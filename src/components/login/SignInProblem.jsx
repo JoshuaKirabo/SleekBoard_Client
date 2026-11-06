@@ -11,12 +11,13 @@ const REASONS =
     not_set_up: "Google sign-in isn't set up on the server yet.",
   };
 
-// One line under the form, read out as soon as it shows. Nothing when the sign-in didn't fail.
+// One line under the form in the brick of every sign-in message, read out as soon as it shows. Nothing when the
+// sign-in didn't fail.
 export default function SignInProblem()
   {
     const [params] = useSearchParams();
     if(params.get("signin") !== "error") return null;
     const message = REASONS[params.get("reason")] || "Sign-in didn't work. Try again.";
 
-    return <p role="alert" className="mt-6 w-full max-w-[388px] pl-3 text-sm leading-relaxed text-ink-2">{message}</p>;
+    return <p role="alert" className="mt-6 w-full max-w-[388px] pl-3 text-sm leading-relaxed text-halt">{message}</p>;
   }

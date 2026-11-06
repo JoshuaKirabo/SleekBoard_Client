@@ -34,6 +34,8 @@ export default function LoginForm()
     // computer forgets you when the browser closes unless you said otherwise.
     const [keepLoggedIn, setKeepLoggedIn] = useState(false);
     const [problem, setProblem] = useState("");
+    // True when the server said the email and password don't match, so both fields carry the message.
+    const [mismatch, setMismatch] = useState(false);
     const [gapsShown, setGapsShown] = useState(false);
     const [busy, setBusy] = useState(false);
     const [params] = useSearchParams();
@@ -52,15 +54,29 @@ export default function LoginForm()
       {
         setGapsShown(true);
         setProblem("");
+        setMismatch(false);
         (found.email ? emailField : passwordField).current.focus();
       };
 
+    // Sign in frees up and the reason shows under the password. When the email and password didn't match, the password
+    // is selected so you can type it again straight away.
+    const turnDown = (error) =>
+      {
+        const wrongPair = error.response?.status === 401;
+        setBusy(false);
+        setProblem(refusalOf(error));
+        setMismatch(wrongPair);
+        if(!wrongPair) return;
+        passwordField.current.focus();
+        passwordField.current.select();
+      };
+
     // Checks the email and password with the server, then walks into the page you were sent here from (?next=), as
-    // long as it's one of the board's own. Sign in stays busy through the walk in; if it was turned down, it frees up
-    // and the reason shows under the form.
+    // long as it's one of the board's own. Sign in stays busy through the walk in.
     const send = async () =>
       {
         setProblem("");
+        setMismatch(false);
         setBusy(true);
         try
           {
@@ -68,8 +84,7 @@ export default function LoginForm()
           }
         catch(error)
           {
-            setBusy(false);
-            return setProblem(refusalOf(error));
+            return turnDown(error);
           }
         swap(safeNext(params.get("next")), "in");
       };
@@ -100,8 +115,8 @@ export default function LoginForm()
           placeholder="Johndoe@gmail.com"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          aria-invalid={gaps.email ? true : undefined}
-          aria-describedby={gaps.email ? "login-email-gap" : undefined}
+          aria-invalid={gaps.email || mismatch ? true : undefined}
+          aria-describedby={gaps.email ? "login-email-gap" : mismatch ? "login-problem" : undefined}
           className={fieldClass}
         />
         {gaps.email && <p id="login-email-gap" className={gapClass}>{gaps.email}</p>}
@@ -115,11 +130,14 @@ export default function LoginForm()
           placeholder="••••••••••"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          aria-invalid={gaps.password ? true : undefined}
-          aria-describedby={gaps.password ? "login-password-gap" : undefined}
+          aria-invalid={gaps.password || mismatch ? true : undefined}
+          aria-describedby={gaps.password ? "login-password-gap" : mismatch ? "login-problem" : undefined}
           className={`${fieldClass} placeholder:tracking-[0.18em]`}
         />
         {gaps.password && <p id="login-password-gap" className={gapClass}>{gaps.password}</p>}
+
+        {/* The server's answer sits right under the fields it's about, in the same brick as the empty-field notes. */}
+        {problem && <p id="login-problem" role="alert" className={gapClass}>{problem}</p>}
 
         <label className="mt-6 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-base text-ink-2">
           <input
@@ -146,8 +164,6 @@ export default function LoginForm()
         <div className="mt-7">
           <GoogleSignIn />
         </div>
-
-        {problem && <p role="alert" className="mt-6 pl-3 text-sm leading-relaxed text-ink-2">{problem}</p>}
       </form>
     );
   }

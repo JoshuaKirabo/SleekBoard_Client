@@ -47,7 +47,8 @@ export default function FeaturePanel()
         {/* Clouds of blue and cream drifting under the grain. Pure decoration, styled in index.css. */}
         <div className="login-aurora" aria-hidden="true"><span /><span /><span /></div>
 
-        <h2 className="relative pl-1 text-[44px] font-semibold leading-[1.3] tracking-[-0.025em]">
+        {/* A step under the form's 42px greeting, so signing in stays the first thing you see. */}
+        <h2 className="relative pl-1 text-[36px] font-semibold leading-[1.25] tracking-[-0.025em]">
           Automate your<br />job search.
         </h2>
 
@@ -63,7 +64,7 @@ export default function FeaturePanel()
         <div className="relative mt-4 flex gap-1.5">
           {FEATURES.map((item, at) => (
             <button key={item.name} type="button" aria-label={`Show ${item.name}`} aria-current={at === turn.index} onClick={() => goTo(at)} className={barClass}>
-              <span className="relative h-[3px] w-full overflow-hidden rounded-full bg-cream/20">
+              <span className="relative h-[3px] w-full overflow-hidden rounded-full bg-cream/45">
                 {at < turn.index && <span className="absolute inset-0 rounded-full bg-cream" />}
                 {at === turn.index && <span key={turn.index} className="login-progress-fill" onAnimationEnd={showNext} />}
               </span>

@@ -571,6 +571,10 @@ body
    panel, so it's kept here once. */
 .login-frame
    {
+      /* The login wells sit a step above the app's surface, because the canvas behind the form is lit and the plain
+         surface colour all but vanished into it. */
+      --login-well: #2a2a2a;
+      --login-well-hover: #313131;
       --login-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncG type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncB type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background:
          radial-gradient(40% 55% at 22% 38%, color-mix(in srgb, var(--color-board-light) 22%, transparent) 0%, transparent 100%),
@@ -649,7 +653,7 @@ body
    focus ring. */
 .login-field
    {
-      background: var(--color-surface);
+      background: var(--login-well);
       box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.035);
       caret-color: var(--color-cream);
       transition: background-color 150ms var(--ease-out-strong);
@@ -657,7 +661,7 @@ body
 
 .login-field:hover
    {
-      background: var(--color-raised);
+      background: var(--login-well-hover);
    }
 
 .login-field:focus
@@ -671,7 +675,7 @@ body
 .login-field:-webkit-autofill
    {
       -webkit-text-fill-color: var(--color-ink);
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), inset 0 0 0 60px var(--color-surface);
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), inset 0 0 0 60px var(--login-well);
    }
 
 .login-check
@@ -680,6 +684,13 @@ body
       height: 16px;
       accent-color: var(--color-cream);
       cursor: pointer;
+   }
+
+/* The same cream ring as every other control on the screen, in place of Chrome's blue one. */
+.login-check:focus-visible
+   {
+      outline: 2px solid var(--color-cream);
+      outline-offset: 2px;
    }
 
 /* Flat Cream Team with canvas text, the same as every main button in the app. It never moves. Pointing at it does
@@ -733,7 +744,7 @@ body
    {
       position: relative;
       isolation: isolate;
-      background-color: var(--color-surface);
+      background-color: var(--login-well);
       color: var(--color-ink);
       transition: background-color 640ms var(--ease-soft);
    }
@@ -797,7 +808,7 @@ body
    {
       .google-signin:hover
          {
-            background-color: var(--color-raised);
+            background-color: var(--login-well-hover);
             transition-duration: 480ms;
          }
 
@@ -830,11 +841,14 @@ body
       transform-origin: 50% 50%;
    }
 
+/* A dash that's fully "off" still leaves a pixel of green where the stroke starts and ends, so the stroke is also
+   hidden at rest. It shows the moment you point at the button and only fades once the light has run back. */
 .google-edge rect
    {
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
-      transition: stroke-dashoffset 1180ms var(--ease-premium);
+      opacity: 0;
+      transition: stroke-dashoffset 1180ms var(--ease-premium), opacity 200ms ease 1000ms;
    }
 
 @media (hover: hover) and (pointer: fine)
@@ -842,6 +856,8 @@ body
       .google-signin:hover .google-edge rect
          {
             stroke-dashoffset: 0;
+            opacity: 1;
+            transition: stroke-dashoffset 1180ms var(--ease-premium), opacity 120ms ease;
          }
    }
 
@@ -899,14 +915,14 @@ body
       opacity: 0.55;
    }
 
-/* In the panel: Board Bright from the top left, warm cream rising from the bottom right, and a Board Light cloud
+/* In the panel: Board Bright from the top left (kept soft so the panel never outshines the form), warm cream rising from the bottom right, and a Board Light cloud
    wandering through the middle, each on its own clock. */
 .login-feature-panel > .login-aurora > span:nth-child(1)
    {
       width: 115%;
       top: -45%;
       left: -45%;
-      background: radial-gradient(closest-side, color-mix(in srgb, var(--color-board-bright) 55%, transparent), transparent);
+      background: radial-gradient(closest-side, color-mix(in srgb, var(--color-board-bright) 35%, transparent), transparent);
       animation: login-drift-a 22s var(--ease-soft) infinite;
    }
 
