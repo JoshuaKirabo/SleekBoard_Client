@@ -2,12 +2,12 @@ import { useState } from "react";
 import SocialSignIn from "./SocialSignIn.jsx";
 import useScreenSwap from "../useScreenSwap.js";
 
-const labelClass = "block pl-3 text-base text-white/90";
+const labelClass = "block pl-3 text-base text-ink-2";
 
-// Black pills with a soft dark halo instead of an outline. The halo and the focus ring live in index.css.
-const fieldClass = "login-field mt-3.5 h-[52px] w-full rounded-full px-[22px] text-[17px] text-white placeholder:text-white/80";
+// Filled pills in the app's well colours. The fill, hover and focus ring live in index.css.
+const fieldClass = "login-field mt-3.5 h-[52px] w-full rounded-full px-[22px] text-[17px] text-ink placeholder:text-ink-3";
 
-const linkClass = "rounded-sm text-base text-white/90 underline underline-offset-[3px] transition-colors duration-150 hover:text-white active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
+const linkClass = "rounded-sm text-base text-cream underline underline-offset-[3px] transition-colors duration-150 hover:text-ink active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
 // The left half of the login card: the greeting, email and password, and the ways in.
 export default function LoginForm()
@@ -28,7 +28,7 @@ export default function LoginForm()
     return (
       <form onSubmit={handleSubmit} className="w-full max-w-[388px]" noValidate>
         <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.025em]">Welcome back</h1>
-        <p className="mt-4 text-xl tracking-[-0.01em] text-white/90">Please Enter your Account details</p>
+        <p className="mt-4 text-xl tracking-[-0.01em] text-ink-2">Please Enter your Account details</p>
 
         <label htmlFor="login-email" className={`${labelClass} mt-[46px]`}>Email</label>
         <input
@@ -53,7 +53,7 @@ export default function LoginForm()
         />
 
         <div className="mt-6 flex items-center justify-between pr-4 pl-2">
-          <label className="flex cursor-pointer items-center gap-2.5 text-base text-white/90">
+          <label className="flex cursor-pointer items-center gap-2.5 text-base text-ink-2">
             <input
               type="checkbox"
               checked={keepLoggedIn}
