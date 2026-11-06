@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "../jobs/spring.js";
 import { postedLabel } from "./huntOptions.js";
-import HuntRadar from "./HuntRadar.jsx";
+import HuntMark from "./HuntMark.jsx";
 import { focusRing } from "./fields/styles.js";
 
 // How long the hunter stays on each step before it moves to the next. It holds on the last one until the hunt ends.
-const STEP_MS = 1600;
-// How many jobs are on the scope by each step.
-const FOUND_BY_STEP = [0, 2, 4];
+const STEP_MS = 2200;
+// The new line's words wait this long for the old line to start leaving, then come in this far apart, each taking
+// WORD_MS to land. These match .hunt-word in index.css.
+const WORD_DELAY_MS = 90;
+const WORD_GAP_MS = 45;
+const WORD_MS = 520;
 
 // What the hunter says it's doing, step by step, in your own numbers.
 const stepsFor = (hunt) =>
@@ -35,13 +38,39 @@ function useStep(count)
     return step;
   }
 
-// The line the hunter is on. The old one rolls up and out as the new one rolls in under it.
+// A line arriving word by word, each word rising out of a blur a beat after the one before. The shimmer only starts
+// once the last word has landed, so the band never runs across words that are still moving.
+function Words({ text })
+  {
+    const words = text.split(" ");
+    const [landed, setLanded] = useState(false);
+
+    useEffect(() =>
+      {
+        const timer = setTimeout(() => setLanded(true), WORD_DELAY_MS + (words.length - 1) * WORD_GAP_MS + WORD_MS);
+        return () => clearTimeout(timer);
+      }, [words.length]);
+
+    return (
+      <span className={landed ? "shimmer-text" : "text-ink-2"}>
+        {words.map((word, index) => (
+          <span key={index}>
+            <span className="hunt-word" style={{ "--i": index }}>{word}</span>
+            {index < words.length - 1 && " "}
+          </span>
+        ))}
+      </span>
+    );
+  }
+
+// The line the hunter is on. The old line lifts away and fades as the new one's words rise in after it. Both sit in
+// the same grid cell, and nothing clips them, so neither is cut off on the way.
 function StepLine({ steps, step })
   {
     return (
-      <p className="roll text-[19px] leading-tight font-semibold tracking-[-0.015em] sm:text-[21px]" role="status">
-        {step > 0 && <span key={step - 1} className="roll-out text-ink-2" aria-hidden="true">{steps[step - 1]}</span>}
-        <span key={step} className="roll-in shimmer-text">{steps[step]}</span>
+      <p className="hunt-line text-[19px] leading-tight font-semibold tracking-[-0.015em] sm:text-[21px]" role="status">
+        {step > 0 && <span key={`out-${step}`} className="hunt-line-out text-ink-2" aria-hidden="true">{steps[step - 1]}</span>}
+        <Words key={step} text={steps[step]} />
       </p>
     );
   }
@@ -58,8 +87,8 @@ function StepBars({ count, step })
     );
   }
 
-// The hunt under way. It comes up the moment you press Hunt: the scope sweeps, the hunter says what it's doing, and
-// jobs light up on the scope as it finds them. Stop ends the hunt.
+// The hunt under way. It comes up the moment you press Hunt: jobs slide past under you and lock into the logo one
+// by one while the hunter says what it's doing. Stop ends the hunt.
 export default function HuntProgress({ hunt, onStop })
   {
     const steps = stepsFor(hunt);
@@ -73,8 +102,8 @@ export default function HuntProgress({ hunt, onStop })
       }, []);
 
     return (
-      <section ref={panel} className="hunt-rise flex w-full items-center gap-5 rounded-3xl bg-surface p-4 pr-5 sm:gap-6 sm:p-5 sm:pr-6" aria-label="Hunting">
-        <HuntRadar found={FOUND_BY_STEP[step]} />
+      <section ref={panel} className="hunt-rise flex w-full items-center gap-5 sm:gap-6" aria-label="Hunting">
+        <HuntMark />
 
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <StepLine steps={steps} step={step} />

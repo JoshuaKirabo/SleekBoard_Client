@@ -908,68 +908,209 @@ html[data-swap="in"]::view-transition-new(root)
       animation-delay: calc(160ms + var(--i, 0) * 22ms);
    }
 
-/* The hunt under way (components/hunter/HuntRadar.jsx). A beam sweeps the scope once every --sweep, brightest on
-   its leading edge and fading behind it. */
-.hunt-radar
+/* The hunt under way, drawn with the logo (components/hunter/HuntMark.jsx). One beat is --beat long: the belt of
+   jobs slides one place along, the job that arrives springs up into the top half and locks, the whole mark flashes,
+   and the job drops back onto the belt for the next beat. The belt fades out at both ends of the window. */
+.hunt-mark
    {
-      --sweep: 2.4s;
+      --beat: 2.6s;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
    }
 
-.hunt-radar-ring
-   {
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 10%, transparent);
-   }
-
-@keyframes hunt-radar-turn
-   {
-      to
-         {
-            rotate: 1turn;
-         }
-   }
-
-.hunt-radar-beam
-   {
-      background: conic-gradient(from 0deg, transparent 0deg 250deg, color-mix(in srgb, var(--color-cream) 6%, transparent) 300deg, color-mix(in srgb, var(--color-cream) 42%, transparent) 359deg, transparent 360deg);
-      animation: hunt-radar-turn var(--sweep) linear infinite;
-   }
-
-/* A found job lights up the moment the beam's edge crosses it, then dims until the next pass. The delay is negative
-   so each blip starts part-way through its cycle, timed to its angle (--at, in degrees from the top). */
-@keyframes hunt-radar-blip
+/* One place along per beat, leaving gently and arriving with purpose, then a rest while the job locks in. The jump
+   back at the end of the beat lands every job on the spot the next one held, so the loop has no seam. */
+@keyframes hunt-mark-belt
    {
       0%
          {
+            transform: translateX(0);
+            animation-timing-function: var(--ease-in-out-strong);
+         }
+      38%, 100%
+         {
+            transform: translateX(117px);
+         }
+   }
+
+.hunt-mark-belt
+   {
+      animation: hunt-mark-belt var(--beat) infinite;
+   }
+
+/* Jobs ride the belt dim and a little low, out of reach of the top half. */
+.hunt-mark-job
+   {
+      fill: var(--color-cream);
+      opacity: 0.28;
+      transform: translateY(20px);
+   }
+
+/* The one that arrives: it springs up past the lock by a hair, settles, brightens, holds, then drops back. */
+@keyframes hunt-mark-lock
+   {
+      0%, 36%
+         {
+            transform: translateY(20px);
+            opacity: 0.28;
+            fill: var(--color-cream);
+            animation-timing-function: var(--ease-out-strong);
+         }
+      50%
+         {
+            transform: translateY(-2.5px);
             opacity: 1;
-            transform: scale(1.3);
-            box-shadow: 0 0 8px 1px color-mix(in srgb, var(--color-cream) 60%, transparent);
+            fill: var(--color-ink);
+            animation-timing-function: var(--ease-out-strong);
+         }
+      58%
+         {
+            transform: translateY(0);
+         }
+      70%
+         {
+            fill: var(--color-cream);
+         }
+      80%
+         {
+            transform: translateY(0);
+            opacity: 1;
+            animation-timing-function: var(--ease-out-strong);
+         }
+      100%
+         {
+            transform: translateY(20px);
+            opacity: 0.28;
+            fill: var(--color-cream);
+         }
+   }
+
+.hunt-mark-match
+   {
+      animation: hunt-mark-lock var(--beat) infinite;
+   }
+
+/* You take the knock: a small lift the moment the job hits, and the same flash. */
+@keyframes hunt-mark-you
+   {
+      0%, 47%
+         {
+            transform: translateY(0);
+            fill: var(--color-cream);
+            animation-timing-function: var(--ease-out-strong);
+         }
+      51%
+         {
+            transform: translateY(-1.5px);
+            fill: var(--color-ink);
+            animation-timing-function: var(--ease-out-strong);
+         }
+      62%
+         {
+            transform: translateY(0);
          }
       70%, 100%
          {
-            opacity: 0.3;
-            transform: scale(0.8);
-            box-shadow: 0 0 0 0 transparent;
+            fill: var(--color-cream);
          }
    }
 
-.hunt-radar-blip
+.hunt-mark-you
    {
-      animation: hunt-radar-blip var(--sweep) var(--ease-out-strong) infinite;
-      animation-delay: calc(var(--at) * var(--sweep) / 360 - var(--sweep));
+      fill: var(--color-cream);
+      animation: hunt-mark-you var(--beat) infinite;
    }
 
-/* Reduced motion: the beam holds still, the blips simply sit on the scope, and the line swaps in place. */
+/* Reduced motion: no belt and no knock. The mark sits whole and slowly brightens and dims while the hunt runs. */
+@keyframes hunt-mark-breathe
+   {
+      from
+         {
+            opacity: 0.55;
+         }
+   }
+
+/* The hunter's step line (HuntProgress.jsx). The old line and the new one share a grid cell, so they overlap
+   without moving anything around them. */
+.hunt-line
+   {
+      display: grid;
+   }
+
+.hunt-line > *
+   {
+      grid-area: 1 / 1;
+   }
+
+/* The old line lifts a little, softens and fades. It's gone before the new words are halfway in. */
+@keyframes hunt-line-out
+   {
+      to
+         {
+            opacity: 0;
+            transform: translateY(-0.3em);
+            filter: blur(4px);
+         }
+   }
+
+.hunt-line-out
+   {
+      animation: hunt-line-out 260ms var(--ease-out-strong) forwards;
+   }
+
+/* Each new word rises a short way out of a blur. The blur hides the overlap with the line leaving, so the two never
+   read as one muddle. Delay and gap match WORD_DELAY_MS and WORD_GAP_MS in HuntProgress.jsx. */
+@keyframes hunt-word-in
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(0.35em);
+            filter: blur(6px);
+         }
+   }
+
+.hunt-word
+   {
+      display: inline-block;
+      animation: hunt-word-in 520ms var(--ease-out-strong) backwards;
+      animation-delay: calc(90ms + var(--i, 0) * 45ms);
+   }
+
+/* Reduced motion: the logo sits whole and breathes, and the line cross-fades in place. */
 @media (prefers-reduced-motion: reduce)
    {
-      .hunt-radar-beam,
-      .hunt-radar-blip
+      .hunt-mark-belt,
+      .hunt-mark-match,
+      .hunt-mark-you
          {
             animation: none;
          }
 
-      .hunt-radar-blip
+      .hunt-mark-job
          {
-            opacity: 0.8;
+            opacity: 0;
+         }
+
+      .hunt-mark-home
+         {
+            opacity: 1;
+            transform: none;
+         }
+
+      .hunt-mark
+         {
+            animation: hunt-mark-breathe 2.4s ease-in-out infinite alternate;
+         }
+
+      .hunt-line-out
+         {
+            animation-name: fade-out;
+         }
+
+      .hunt-word
+         {
+            animation-name: fade-in;
          }
    }
 
