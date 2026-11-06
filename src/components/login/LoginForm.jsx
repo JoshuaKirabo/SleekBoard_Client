@@ -43,12 +43,12 @@ const NO_GAPS = { email: "", password: "" };
 
 // What each empty field says. An email of only spaces counts as empty because the server trims it away; a password is
 // taken exactly as typed.
-const gapsIn = ({ email, password }) => ({ email: email.trim() ? "" : "Enter your email.", password: password ? "" : "Enter your password." });
+const gapsIn = ({ email, password }) => ({ email: email.trim() ? "" : "Please enter your email.", password: password ? "" : "Please enter your password." });
 
 // The line under the form when the server turns a sign-in down. Its 401, 429 and 503 each carry their own sentence, and
 // problemOf covers no reply at all. A reply with no sentence (a crash, a proxy's error page) gets a plain try-again
 // rather than problemOf's "couldn't reach", since the server did answer.
-const refusalOf = (error) => error.response && !error.response.data?.message ? "Sign-in didn't work. Try again." : problemOf(error);
+const refusalOf = (error) => error.response && !error.response.data?.message ? "Please try again. Sign-in didn't work." : problemOf(error);
 
 // The left half of the login card: the greeting, email and password, and the ways in.
 export default function LoginForm()

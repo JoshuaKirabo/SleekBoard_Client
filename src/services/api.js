@@ -9,7 +9,7 @@ export const getHealth = async () =>
   };
 
 // A failed request as one sentence to show. The server sends its own message; no reply at all means it isn't up.
-export const problemOf = (error) => error.response?.data?.message || "Couldn't reach the SleekBoard server.";
+export const problemOf = (error) => error.response?.data?.message || "Please try again in a moment. SleekBoard's server can't be reached.";
 
 // Sign-in. Starting is a plain link, like Gmail's: the server sends you to Google, and Google sends you back to the
 // board, or to /login?signin=error&reason=….
