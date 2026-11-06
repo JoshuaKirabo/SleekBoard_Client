@@ -3,7 +3,7 @@ import {
   ROLE_TYPES, STAGES, STAFFING, SALARY, EXPERIENCE,
 } from "./huntOptions.js";
 import { ALL_ROLES } from "./roleCatalog.js";
-import { Field, Folded } from "./fields/Field.jsx";
+import { Field } from "./fields/Field.jsx";
 import TagField from "./fields/TagField.jsx";
 import ChoiceTiles from "./fields/ChoiceTiles.jsx";
 import PostedWithin from "./fields/PostedWithin.jsx";
@@ -32,7 +32,7 @@ export const SECTIONS = [
   {
     id: "interests",
     title: "Areas of interest",
-    count: (hunt) => sum(hunt.industries, hunt.excludedIndustries, hunt.skills, hunt.excludedSkills, hunt.roleTypes),
+    count: (hunt) => sum(hunt.industries, hunt.skills, hunt.roleTypes),
   },
   {
     id: "companies",
@@ -111,17 +111,11 @@ export default function HuntSections({ hunt, set, rolesInput })
 
         <Section id="interests" index={2}>
           <Field label="Industry" onClear={clear("industries")}>
-            <TagField label="Industry" values={hunt.industries} onChange={set("industries")} suggestions={INDUSTRY_SUGGESTIONS} placeholder="Software, Fintech…" />
+            <TagField label="Industry" values={hunt.industries} onChange={set("industries")} suggestions={INDUSTRY_SUGGESTIONS} />
           </Field>
-          <Folded label="Excluded industries" count={hunt.excludedIndustries.length}>
-            <TagField label="Excluded industries" values={hunt.excludedIndustries} onChange={set("excludedIndustries")} suggestions={INDUSTRY_SUGGESTIONS} placeholder="An industry" />
-          </Folded>
           <Field label="Skill" onClear={clear("skills")}>
-            <TagField label="Skill" values={hunt.skills} onChange={set("skills")} suggestions={SKILL_SUGGESTIONS} placeholder="Java, Python, AWS…" />
+            <TagField label="Skill" values={hunt.skills} onChange={set("skills")} suggestions={SKILL_SUGGESTIONS} />
           </Field>
-          <Folded label="Excluded skills" count={hunt.excludedSkills.length}>
-            <TagField label="Excluded skills" values={hunt.excludedSkills} onChange={set("excludedSkills")} suggestions={SKILL_SUGGESTIONS} placeholder="A skill" />
-          </Folded>
           <Field label="Role type" onClear={clear("roleTypes")}>
             <ChoiceTiles options={ROLE_TYPES} values={hunt.roleTypes} onChange={set("roleTypes")} />
           </Field>
@@ -129,7 +123,7 @@ export default function HuntSections({ hunt, set, rolesInput })
 
         <Section id="companies" index={3}>
           <Field label="Company" onClear={clear("companies")}>
-            <TagField label="Company" values={hunt.companies} onChange={set("companies")} placeholder="NVIDIA, Stripe…" />
+            <TagField label="Company" values={hunt.companies} onChange={set("companies")} />
           </Field>
           <Field label="Company stage" onClear={clear("stages")}>
             <ChoiceTiles options={STAGES} values={hunt.stages} onChange={set("stages")} />

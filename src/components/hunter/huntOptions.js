@@ -46,7 +46,7 @@ export const EMPTY_HUNT =
   {
     roles: [], jobTypes: [], workModels: [], locations: [], levels: [], experience: { any: true, amount: 2 }, posted: null,
     salary: { any: true, amount: 80000 }, sponsorship: [], limits: [],
-    industries: [], excludedIndustries: [], skills: [], excludedSkills: [], roleTypes: [],
+    industries: [], skills: [], roleTypes: [],
     companies: [], stages: [], staffing: [], excludedCompanies: [],
     start: { year: "", season: "" }, graduation: { year: "", season: "" },
   };
