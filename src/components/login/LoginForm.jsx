@@ -30,7 +30,9 @@ export default function LoginForm()
   {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [keepLoggedIn, setKeepLoggedIn] = useState(true);
+    // Starts unticked, like Mailtrain's login form: staying signed in for 30 days is something you choose, so a shared
+    // computer forgets you when the browser closes unless you said otherwise.
+    const [keepLoggedIn, setKeepLoggedIn] = useState(false);
     const [problem, setProblem] = useState("");
     const [gapsShown, setGapsShown] = useState(false);
     const [busy, setBusy] = useState(false);
