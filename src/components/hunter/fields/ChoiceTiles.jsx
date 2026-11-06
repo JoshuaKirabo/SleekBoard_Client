@@ -18,9 +18,10 @@ export default function ChoiceTiles({ options, values, onChange, columns = "sm:g
                 type="button"
                 aria-pressed={on}
                 onClick={() => onChange(flip(values, option))}
-                className={`flex h-12 cursor-pointer items-center gap-3 rounded-xl px-4 text-left text-[14.5px] font-medium transition-[background-color,color,scale] duration-150 ease-out-strong active:scale-[0.98] ${on ? "bg-cream/[0.1] text-cream" : "bg-canvas text-ink-2 hover:bg-raised hover:text-ink"} ${focusRing}`}
+                className={`group flex h-12 cursor-pointer items-center gap-3 rounded-xl px-4 text-left text-[14.5px] font-medium active:scale-[0.98] ${on ? "bg-cream/[0.1] text-cream transition-[background-color,color,scale] duration-150 ease-out-strong" : "hunt-tile bg-canvas text-ink-2 hover:text-ink"} ${focusRing}`}
               >
-                <span className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[6px] transition-colors duration-150 ${on ? "bg-cream text-canvas" : "bg-raised"}`}>
+                {/* Unticked, the box is an outline bright enough to read as a checkbox, and it brightens with the tile. */}
+                <span className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[6px] transition-[background-color,box-shadow] duration-150 ${on ? "bg-cream text-canvas" : "shadow-[inset_0_0_0_1.5px_rgb(255_255_255/0.35)] group-hover:shadow-[inset_0_0_0_1.5px_rgb(255_255_255/0.55)]"}`}>
                   <CheckIcon size={13} strokeWidth={2.4} className={`transition-[scale,opacity] duration-200 ease-out-strong ${on ? "scale-100 opacity-100" : "scale-50 opacity-0"}`} />
                 </span>
                 {option}

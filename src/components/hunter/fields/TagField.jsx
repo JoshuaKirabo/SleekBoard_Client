@@ -73,7 +73,7 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
         setOpen(false);
       };
 
-    const size = big ? "min-h-14 px-3 py-2.5 text-[16px]" : "min-h-12 px-2.5 py-2 text-[14.5px]";
+    const size = `min-h-12 px-2.5 py-2 ${big ? "text-[16px]" : "text-[14.5px]"}`;
 
     return (
       <div ref={box} onKeyDown={closeOnEscape} onBlur={onLeave} className="relative">
@@ -100,7 +100,7 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
             placeholder={values.length ? "" : placeholder}
             aria-label={label}
             aria-expanded={menu ? open : undefined}
-            className="h-8 min-w-[10ch] flex-1 bg-transparent px-1.5 text-ink placeholder:text-ink-3/70 focus:outline-none"
+            className="h-8 min-w-[10ch] flex-1 bg-transparent px-1.5 text-ink placeholder:text-ink-3 focus:outline-none"
           />
         </div>
 

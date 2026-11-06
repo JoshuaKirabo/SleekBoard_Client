@@ -939,6 +939,52 @@ html[data-swap="in"]::view-transition-new(root)
       opacity: 0.35;
    }
 
+/* The popup's scroll area fades out at both edges, so a field passing under the header or above the footer melts
+   away instead of being sliced in half. */
+.hunt-scroll
+   {
+      mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 40px), transparent 100%);
+   }
+
+/* A small cut of the card hug for the choice tiles: cream light rising from the bottom edge and a cream tint in the
+   fill, on the same fast-start-long-settle curve. No stroke, there are too many tiles side by side for that. */
+.hunt-tile
+   {
+      position: relative;
+      isolation: isolate;
+      transition: scale 150ms var(--ease-out-strong), color 600ms var(--ease-premium), background-color 900ms var(--ease-premium);
+   }
+
+.hunt-tile::before
+   {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(80% 120% at 50% 100%, rgb(219 216 206 / 0.16) 0%, rgb(219 216 206 / 0.06) 50%, transparent 80%);
+      opacity: 0;
+      transform: scaleY(0.5);
+      transform-origin: 50% 100%;
+      transition: opacity 1180ms var(--ease-premium), transform 1180ms var(--ease-premium);
+   }
+
+@media (hover: hover) and (pointer: fine)
+   {
+      .hunt-tile:hover
+         {
+            background-color: color-mix(in oklab, var(--color-canvas) 90%, var(--color-cream));
+            transition-duration: 150ms, 150ms, 600ms;
+         }
+
+      .hunt-tile:hover::before
+         {
+            opacity: 1;
+            transform: scaleY(1);
+         }
+   }
+
 /* The role picker drops out of the roles box: a short fade and settle from just above, growing from its top edge so
    it reads as coming out of the box. No exit animation; it goes the moment you're done with it. */
 @keyframes role-menu-in

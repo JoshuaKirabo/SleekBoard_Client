@@ -7,8 +7,8 @@ import { focusRing } from "./fields/styles.js";
 
 // Each item in the left-hand list is this tall, so the highlight behind the active one can slide by whole steps.
 const NAV_ITEM_PX = 48;
-// A section counts as the one you're reading once its title is within this far of the top of the scroll area.
-const READING_LINE_PX = 120;
+// A section counts as the one you're reading once its title is above this share of the scroll area's height.
+const READING_LINE = 0.4;
 
 // Why Start hunting can't be pressed yet, in words, or nothing when it can.
 const whatsMissing = (hunt) =>
@@ -24,7 +24,7 @@ const sectionInView = (scroller) =>
   {
     const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4;
     if(atBottom) return SECTIONS[SECTIONS.length - 1].id;
-    const passed = [...scroller.querySelectorAll("[data-section]")].filter((section) => section.offsetTop - scroller.scrollTop <= READING_LINE_PX);
+    const passed = [...scroller.querySelectorAll("[data-section]")].filter((section) => section.offsetTop - scroller.scrollTop <= scroller.clientHeight * READING_LINE);
     return passed.length ? passed[passed.length - 1].dataset.section : SECTIONS[0].id;
   };
 
@@ -59,7 +59,7 @@ function SectionNav({ hunt, active, onPick, rise })
             const count = section.count(hunt);
             const on = section.id === active;
             return (
-              <button key={section.id} type="button" onClick={() => onPick(section.id)} aria-current={on ? "true" : undefined} className={`relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 text-left transition-colors duration-150 ${on ? "text-ink" : "text-ink-2 hover:text-ink"} ${focusRing}`} style={{ height: NAV_ITEM_PX }}>
+              <button key={section.id} type="button" onClick={() => onPick(section.id)} aria-current={on ? "true" : undefined} className={`relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl px-3 text-left transition-colors duration-150 ${on ? "text-ink" : "text-ink-2 hover:text-ink"} ${focusRing}`} style={{ height: NAV_ITEM_PX }}>
                 <span className="min-w-0 truncate text-[14.5px] font-semibold">{section.title}</span>
                 {count > 0 && <span key={count} className="tag-pop text-[13px] font-semibold text-cream tabular-nums">{count}</span>}
               </button>
@@ -138,18 +138,17 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
           <div className="flex min-h-0 flex-1">
             <SectionNav hunt={draft} active={active} onPick={goTo} rise={rise} />
 
-            <div ref={scroller} onScroll={(event) => setActive(sectionInView(event.currentTarget))} className="lane-scroll relative min-w-0 flex-1 overflow-y-auto px-7 pt-1 lg:pr-10 lg:pl-4">
-              <div key={session} className="mx-auto max-w-[640px] pb-10">
+            <div ref={scroller} onScroll={(event) => setActive(sectionInView(event.currentTarget))} className="lane-scroll hunt-scroll relative min-w-0 flex-1 overflow-y-auto px-7 pt-4 lg:pl-10">
+              <div key={session} className="mx-auto max-w-[640px] pb-10 lg:mx-0 lg:max-w-none">
                 <HuntSections hunt={draft} set={set} rolesInput={rolesInput} />
               </div>
             </div>
           </div>
 
-          {/* The fade above the footer says there's more underneath without drawing a line across the popup. */}
+          {/* The scroll area fades out above the footer, so there's no line across the popup. */}
           <footer className="relative flex flex-wrap items-center justify-between gap-3 px-7 py-4">
-            <span className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-surface to-transparent" aria-hidden="true" />
             <div className="flex items-center gap-3 text-[13.5px]">
-              <span className="text-ink-2 tabular-nums">{total ? `${total} picked` : "Nothing picked yet"}</span>
+              <span className="text-ink-3 tabular-nums">{total ? `${total} picked` : "Nothing picked yet"}</span>
               {total > 0 && (
                 <button type="button" onClick={() => setDraft(EMPTY_HUNT)} className={`cursor-pointer rounded-md font-medium text-ink-2 underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline ${focusRing}`}>
                   Clear all
@@ -157,11 +156,10 @@ export default function HuntPreferences({ open, hunt, firstTime, onClose, onSave
               )}
             </div>
             <div className="flex items-center gap-2">
-              {missing && <span className="hidden text-[13px] text-ink-3 md:inline">{missing}</span>}
               <button type="button" onClick={onClose} className={`h-11 cursor-pointer rounded-full px-4 text-[13.5px] font-medium text-ink-2 transition-colors duration-150 hover:bg-raised hover:text-ink ${focusRing}`}>
                 Cancel
               </button>
-              <button type="button" disabled={Boolean(missing)} onClick={() => onSave(draft)} title={missing || undefined} className={`h-11 cursor-pointer rounded-full bg-cream px-5 text-[14px] font-semibold text-canvas transition-[background-color,opacity,scale] duration-150 ease-out-strong hover:bg-ink active:scale-[0.97] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-cream disabled:active:scale-100 ${focusRing}`}>
+              <button type="button" disabled={Boolean(missing)} onClick={() => onSave(draft)} title={missing || undefined} className={`h-11 cursor-pointer rounded-full bg-cream px-5 text-[14px] font-semibold text-canvas transition-[background-color,opacity,scale] duration-150 ease-out-strong hover:bg-ink active:scale-[0.97] disabled:cursor-default disabled:bg-raised disabled:text-ink-3 disabled:hover:bg-raised disabled:active:scale-100 ${focusRing}`}>
                 {firstTime ? "Start hunting" : "Save"}
               </button>
             </div>

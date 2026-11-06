@@ -50,9 +50,9 @@ function Section({ id, index, children })
   {
     const { title } = SECTIONS[index];
     return (
-      <section id={`hunt-${id}`} data-section={id} className="rise scroll-mt-6 space-y-7 pb-12" style={{ "--i": index + 1 }}>
-        <h3 className="text-[22px] leading-tight font-bold tracking-[-0.015em]">{title}</h3>
-        {children}
+      <section id={`hunt-${id}`} data-section={id} className="rise scroll-mt-6 pb-14" style={{ "--i": index + 1 }}>
+        <h3 className="mb-5 text-[18px] leading-tight font-semibold tracking-[-0.01em]">{title}</h3>
+        <div className="space-y-8">{children}</div>
       </section>
     );
   }
@@ -68,29 +68,32 @@ export default function HuntSections({ hunt, set, rolesInput })
         return isEmpty ? undefined : () => set(key)(empty);
       };
 
+    // The same for a year-and-season pair, which is empty when neither half is picked.
+    const clearWhen = (key) => (filled(hunt[key]) ? () => set(key)({ year: "", season: "" }) : undefined);
+
     return (
       <>
         <Section id="basics" index={0}>
-          <Field label="Job function">
+          <Field label="Job function" required onClear={clear("roles")}>
             <TagField label="Job function" values={hunt.roles} onChange={set("roles")} suggestions={ALL_ROLES} placeholder="Please select/enter your expected job function" big menu inputRef={rolesInput} />
           </Field>
-          <Field label="Job type">
+          <Field label="Date posted" required onClear={clear("posted", null)}>
+            <PostedWithin value={hunt.posted} onChange={set("posted")} />
+          </Field>
+          <Field label="Job type" onClear={clear("jobTypes")}>
             <ChoiceTiles options={JOB_TYPES} values={hunt.jobTypes} onChange={set("jobTypes")} />
           </Field>
-          <Field label="Work model">
+          <Field label="Work model" onClear={clear("workModels")}>
             <ChoiceTiles options={WORK_MODELS} values={hunt.workModels} onChange={set("workModels")} />
           </Field>
-          <Field label="Location">
+          <Field label="Location" onClear={clear("locations")}>
             <TagField label="Location" values={hunt.locations} onChange={set("locations")} suggestions={LOCATION_SUGGESTIONS} placeholder="A city, state or country" />
           </Field>
-          <Field label="Experience level">
+          <Field label="Experience level" onClear={clear("levels")}>
             <ChoiceTiles options={LEVELS} values={hunt.levels} onChange={set("levels")} />
           </Field>
           <Field label="Required experience">
             <LimitField value={hunt.experience} onChange={set("experience")} max={EXPERIENCE.max} step={EXPERIENCE.step} describe={years} anyLabel="Any requirements" sliderLabel="Most years of experience a job may ask for" />
-          </Field>
-          <Field label="Date posted" onClear={clear("posted", null)}>
-            <PostedWithin value={hunt.posted} onChange={set("posted")} />
           </Field>
         </Section>
 
@@ -101,7 +104,7 @@ export default function HuntSections({ hunt, set, rolesInput })
           <Field label="Work authorization">
             <ChoiceTiles options={SPONSORSHIP} values={hunt.sponsorship} onChange={set("sponsorship")} />
           </Field>
-          <Field label="Exclude jobs with limitations">
+          <Field label="Exclude jobs with limitations" onClear={clear("limits")}>
             <ChoiceTiles options={LIMITS} values={hunt.limits} onChange={set("limits")} />
           </Field>
         </Section>
@@ -140,10 +143,10 @@ export default function HuntSections({ hunt, set, rolesInput })
         </Section>
 
         <Section id="timing" index={4}>
-          <Field label="Start time">
+          <Field label="Start time" onClear={clearWhen("start")}>
             <WhenField label="Start" value={hunt.start} onChange={set("start")} />
           </Field>
-          <Field label="Graduation time">
+          <Field label="Graduation time" onClear={clearWhen("graduation")}>
             <WhenField label="Graduation" value={hunt.graduation} onChange={set("graduation")} />
           </Field>
         </Section>
