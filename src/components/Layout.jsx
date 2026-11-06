@@ -10,6 +10,7 @@ const TITLES =
     "/chat": "Chat",
     "/resume": "Resume",
     "/jobs": "Jobs",
+    "/job-hunter": "Job Hunter",
     "/application": "Application",
   };
 

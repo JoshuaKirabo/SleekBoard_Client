@@ -36,6 +36,16 @@ export const JobsIcon = (props) => (
   </Icon>
 );
 
+// A radar sweep, for the Job Hunter that scouts the web for fresh postings.
+export const HunterIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M16.5 12A4.5 4.5 0 1 1 12 7.5" />
+    <path d="M12 12l6.4-6.4" />
+    <circle cx="12" cy="12" r="0.6" fill="currentColor" />
+  </Icon>
+);
+
 export const ApplicationIcon = (props) => (
   <Icon {...props}>
     <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />

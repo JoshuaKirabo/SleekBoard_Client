@@ -1,13 +1,14 @@
 import { NavLink, Link } from "react-router-dom";
 import wordmark from "../assets/brand/wordmark-white.svg";
-import { GridIcon, ChatIcon, ResumeIcon, JobsIcon, ApplicationIcon, ChartIcon } from "./icons.jsx";
+import { GridIcon, ChatIcon, ResumeIcon, JobsIcon, HunterIcon, ApplicationIcon, ChartIcon } from "./icons.jsx";
 
-// Same six items as the reference screen. Only Analytics has a page so far, the rest land on 404 until built.
+// The reference screen's six items plus Job Hunter. Only Analytics has a page so far, the rest land on 404 until built.
 const NAV = [
   { to: "/dashboard", label: "Dashboard", Icon: GridIcon },
   { to: "/chat", label: "Chat", Icon: ChatIcon },
   { to: "/resume", label: "Resume", Icon: ResumeIcon },
   { to: "/jobs", label: "Jobs", Icon: JobsIcon },
+  { to: "/job-hunter", label: "Job Hunter", Icon: HunterIcon },
   { to: "/application", label: "Application", Icon: ApplicationIcon },
   { to: "/", label: "Analytics", Icon: ChartIcon },
 ];
