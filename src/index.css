@@ -24,9 +24,10 @@
       --color-cream: #dbd8ce;
       --color-stone: #8a8679;
 
-      /* The two outcomes. Sage and brick rather than traffic-light green and red, so they sit with the warm greys. */
+      /* The two outcomes. Sage for good news; for bad news a clear, warm red that reads as an error at a glance (Josh
+         turned down the old brick, #c9867b, as too muddy) but still leans warm enough to sit with the greys. */
       --color-go: #9bc4a3;
-      --color-halt: #c9867b;
+      --color-halt: #f2665c;
 
       /* A stronger ease-out than the browser's. Arrives fast, lands soft. */
       --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);

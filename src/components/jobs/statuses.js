@@ -1,5 +1,5 @@
 // The six lanes, in the order an application actually moves through them. Each lane's rail carries its own colour:
-// stone while it is still to apply, Board Blue once sent, cream in the room, sage when the offer lands, brick once
+// stone while it is still to apply, Board Blue once sent, cream in the room, sage when the offer lands, red once
 // rejected, and a dim grey when they went quiet on you.
 export const STATUSES = [
   { id: "saved", label: "To Apply", rail: "bg-stone", empty: "Save a role you want to apply to." },
