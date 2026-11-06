@@ -17,8 +17,8 @@ const SAMPLE_HUNT =
       "Machine Learning, Infrastructure", "Machine Learning, Search System", "Data Annotation/AI Tutor", "Machine Learning, Ads",
     ],
     jobTypes: ["Internship"],
-    workModels: ["Onsite", "Remote", "Hybrid"],
-    levels: ["Intern/New grad", "Entry level"],
+    workModels: ["Onsite", "Hybrid", "Remote anywhere in the US"],
+    levels: ["Intern/New Grad", "Entry Level"],
     locations: ["United States"],
     posted: { amount: 24, unit: "hours" },
   };
@@ -29,8 +29,8 @@ const GREETINGS =
     none: "Tell me which roles to hunt, and I'll bring you the fresh ones.",
   };
 
-// The quieter chips under the roles: job type, work model, level and where.
-const detailsOf = (hunt) => [...hunt.jobTypes, ...hunt.workModels, ...hunt.levels, ...hunt.locations];
+// The quieter chips under the roles, in the popup's order: job type, work model, location, experience level.
+const detailsOf = (hunt) => [...hunt.jobTypes, ...hunt.workModels, ...hunt.locations, ...hunt.levels];
 
 // The Job Hunter's first screen. The hunter sends you a message, and once it has finished typing, the box with your
 // roles comes up under it. Edit roles or Add roles opens the big preferences popup. The sidebar stays, so the

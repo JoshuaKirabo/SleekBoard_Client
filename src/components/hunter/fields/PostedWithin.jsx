@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { POSTED_PRESETS, postedLabel } from "../huntOptions.js";
+import { POSTED_PRESETS } from "../huntOptions.js";
 import { focusRing, well, pill } from "./styles.js";
 
 const same = (a, b) => a && b && a.amount === b.amount && a.unit === b.unit;
@@ -38,8 +38,8 @@ export default function PostedWithin({ value, onChange })
           {
             const on = !custom && same(preset, value);
             return (
-              <button key={postedLabel(preset)} type="button" aria-pressed={on} onClick={() => pickPreset(preset)} className={`${pill} h-10 px-4 text-[14px] ${chosen(on)}`}>
-                {postedLabel(preset)}
+              <button key={preset.label} type="button" aria-pressed={on} onClick={() => pickPreset({ amount: preset.amount, unit: preset.unit })} className={`${pill} h-10 px-4 text-[14px] ${chosen(on)}`}>
+                {preset.label}
               </button>
             );
           })}

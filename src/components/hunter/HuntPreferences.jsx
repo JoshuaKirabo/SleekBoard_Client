@@ -13,9 +13,9 @@ const READING_LINE_PX = 120;
 // Why Start hunting can't be pressed yet, in words, or nothing when it can.
 const whatsMissing = (hunt) =>
   {
-    if(!hunt.roles.length && !hunt.posted) return "Add a role and pick how new jobs should be";
-    if(!hunt.roles.length) return "Add at least one role";
-    if(!hunt.posted) return "Pick how new jobs should be";
+    if(!hunt.roles.length && !hunt.posted) return "Add a job function and pick a date posted";
+    if(!hunt.roles.length) return "Add at least one job function";
+    if(!hunt.posted) return "Pick a date posted";
     return "";
   };
 
@@ -52,7 +52,7 @@ function SectionNav({ hunt, active, onPick, rise })
     const index = Math.max(0, SECTIONS.findIndex((section) => section.id === active));
 
     return (
-      <nav className={`${rise} relative hidden w-[260px] shrink-0 px-4 lg:block`} style={{ "--i": 1 }} aria-label="Sections">
+      <nav className={`${rise} relative hidden w-[300px] shrink-0 px-4 lg:block`} style={{ "--i": 1 }} aria-label="Sections">
         <span className="absolute inset-x-4 top-0 rounded-2xl bg-raised transition-[translate] duration-300 ease-in-out-strong" style={{ height: NAV_ITEM_PX, translate: `0 ${index * NAV_ITEM_PX}px` }} aria-hidden="true" />
         {SECTIONS.map((section) =>
           {
@@ -61,7 +61,7 @@ function SectionNav({ hunt, active, onPick, rise })
             return (
               <button key={section.id} type="button" onClick={() => onPick(section.id)} aria-current={on ? "true" : undefined} className={`relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 text-left transition-colors duration-150 ${on ? "text-ink" : "text-ink-2 hover:text-ink"} ${focusRing}`} style={{ height: NAV_ITEM_PX }}>
                 <span className="min-w-0">
-                  <span className="block text-[14.5px] font-semibold">{section.title}</span>
+                  <span className="block truncate text-[14.5px] font-semibold">{section.title}</span>
                   <span className="block truncate text-[12.5px] text-ink-3">{section.hint}</span>
                 </span>
                 {count > 0 && <span key={count} className="tag-pop text-[13px] font-semibold text-cream tabular-nums">{count}</span>}

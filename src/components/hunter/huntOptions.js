@@ -1,4 +1,5 @@
-// Everything the hunt preferences popup offers, and what a hunt looks like before you've picked anything.
+// Everything the hunt preferences popup offers, and what a hunt looks like before you've picked anything. The
+// fields and their order follow Jobright's filters; the wording is ours where theirs was unclear.
 
 export const LOCATION_SUGGESTIONS = [
   "United States", "Remote in the US", "New York, NY", "San Francisco, CA", "Seattle, WA", "Austin, TX", "Boston, MA",
@@ -6,7 +7,7 @@ export const LOCATION_SUGGESTIONS = [
 ];
 
 export const INDUSTRY_SUGGESTIONS = [
-  "Information Technology", "Artificial Intelligence", "Software", "Financial Services", "Fintech", "Consulting",
+  "Information Technology", "Artificial Intelligence (AI)", "Software", "Financial Services", "Fintech", "Consulting",
   "Healthcare", "E-commerce", "Education", "Gaming", "Cybersecurity",
 ];
 
@@ -15,36 +16,38 @@ export const SKILL_SUGGESTIONS = [
   "C++", "Go", "PyTorch",
 ];
 
-export const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
-export const WORK_MODELS = ["Onsite", "Hybrid", "Remote"];
-export const LEVELS = ["Intern/New grad", "Entry level", "Mid level", "Senior"];
-export const SPONSORSHIP = ["Needs H1B sponsorship"];
+// Two columns, read across: Full-time and Contract on the first row, like Jobright.
+export const JOB_TYPES = ["Full-time", "Contract", "Part-time", "Internship"];
+export const WORK_MODELS = ["Onsite", "Hybrid", "Remote anywhere in the US"];
+export const LEVELS = ["Intern/New Grad", "Entry Level", "Mid Level", "Senior Level", "Lead/Staff", "Director/Executive"];
+export const SPONSORSHIP = ["H1B sponsorship"];
 export const LIMITS = ["Security clearance required", "US citizens only"];
-export const ROLE_TYPES = ["Individual contributor", "Manager"];
+export const ROLE_TYPES = ["Individual contributor (IC)", "Manager"];
 export const STAGES = ["Early stage", "Growth stage", "Late stage", "Public company"];
-export const STAFFING = ["Skip staffing agencies"];
+export const STAFFING = ["Exclude staffing agencies"];
 
 export const SEASONS = ["Spring", "Summer", "Fall", "Winter"];
 const thisYear = new Date().getFullYear();
 export const YEARS = [0, 1, 2, 3].map((ahead) => String(thisYear + ahead));
 
-// How new a job has to be. You pick it; the quick picks are only shortcuts.
+// How new a job has to be. Jobright's four quick picks, plus Custom, because what counts as fresh is yours to say.
 export const POSTED_PRESETS = [
-  { amount: 6, unit: "hours" },
-  { amount: 24, unit: "hours" },
-  { amount: 3, unit: "days" },
-  { amount: 7, unit: "days" },
+  { label: "Past 24 hours", amount: 24, unit: "hours" },
+  { label: "Past 3 days", amount: 3, unit: "days" },
+  { label: "Past week", amount: 7, unit: "days" },
+  { label: "Past month", amount: 30, unit: "days" },
 ];
 
-export const SALARY_MAX = 300000;
-export const SALARY_STEP = 5000;
+// The two "up to a limit, or open to all" sliders.
+export const SALARY = { max: 300000, step: 5000 };
+export const EXPERIENCE = { max: 10, step: 1 };
 
 export const EMPTY_HUNT =
   {
-    roles: [], excludedTitles: [], jobTypes: [], workModels: [], levels: [], locations: [], posted: null,
-    salary: { any: true, min: 80000 }, sponsorship: [], limits: [],
+    roles: [], jobTypes: [], workModels: [], locations: [], levels: [], experience: { any: true, amount: 2 }, posted: null,
+    salary: { any: true, amount: 80000 }, sponsorship: [], limits: [],
     industries: [], excludedIndustries: [], skills: [], excludedSkills: [], roleTypes: [],
-    companies: [], excludedCompanies: [], stages: [], staffing: [],
+    companies: [], stages: [], staffing: [], excludedCompanies: [],
     start: { year: "", season: "" }, graduation: { year: "", season: "" },
   };
 
