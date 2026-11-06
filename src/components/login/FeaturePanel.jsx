@@ -44,6 +44,9 @@ export default function FeaturePanel()
 
     return (
       <div className="login-feature-panel relative flex h-full flex-col overflow-hidden rounded-[30px] px-[52px] pt-[64px] pb-[52px]">
+        {/* Clouds of blue and cream drifting under the grain. Pure decoration, styled in index.css. */}
+        <div className="login-aurora" aria-hidden="true"><span /><span /><span /></div>
+
         <h2 className="relative pl-1 text-[44px] font-semibold leading-[1.3] tracking-[-0.025em]">
           Automate your<br />job search.
         </h2>
