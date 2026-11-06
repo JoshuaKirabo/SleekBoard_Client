@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import GoogleSignIn from "./GoogleSignIn.jsx";
+import ShowPasswordButton from "./ShowPasswordButton.jsx";
 import useScreenSwap from "../useScreenSwap.js";
 import { logIn, problemOf } from "../../services/api.js";
 import { safeNext } from "../auth/nextPath.js";
@@ -59,11 +60,38 @@ export default function LoginForm()
     const [mismatch, setMismatch] = useState(false);
     const [gapsShown, setGapsShown] = useState(false);
     const [busy, setBusy] = useState(false);
+    // Whether the password shows as typed rather than as dots.
+    const [passwordShown, setPasswordShown] = useState(false);
+    // Where the caret was in the password when the eye was pressed. Chrome sends it back to the start when a field
+    // switches between hidden and shown, so it's put back right after.
+    const passwordCaret = useRef(null);
     const [params] = useSearchParams();
     const emailField = useRef(null);
     const passwordField = useRef(null);
 
     const swap = useScreenSwap();
+
+    // Shows or hides the password, remembering where the caret was so you carry on typing where you left off.
+    const togglePassword = () =>
+      {
+        const field = passwordField.current;
+        passwordCaret.current = [field.selectionStart, field.selectionEnd];
+        setPasswordShown((now) => !now);
+      };
+
+    // Puts the caret back once the field has switched. Chrome then moves it to the start a few milliseconds later, as it
+    // takes another look at the field, so it's put back once more just after that, well before anyone can type.
+    useLayoutEffect(() =>
+      {
+        const caret = passwordCaret.current;
+        if(!caret) return;
+        passwordCaret.current = null;
+        const field = passwordField.current;
+        const putBack = () => field.setSelectionRange(...caret);
+        putBack();
+        const timer = setTimeout(putBack, 60);
+        return () => clearTimeout(timer);
+      }, [passwordShown]);
 
     // Like Mailtrain, the empty-field notes stay hidden until a sign-in is tried with a gap. From then on they follow
     // the fields as you type: gone once a field has something in it, back if it's emptied again.
@@ -143,18 +171,22 @@ export default function LoginForm()
         <NoteLine id="login-email-note" text={gaps.email} />
 
         <label htmlFor="login-password" className={`${labelClass} mt-2.5`}>Password</label>
-        <input
-          ref={passwordField}
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••••"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          aria-invalid={gaps.password || mismatch ? true : undefined}
-          aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
-          className={`${fieldClass} placeholder:tracking-[0.18em]`}
-        />
+        {/* The eye sits inside the pill's right end, so the text stops short of it. */}
+        <div className="relative">
+          <input
+            ref={passwordField}
+            id="login-password"
+            type={passwordShown ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="••••••••••"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            aria-invalid={gaps.password || mismatch ? true : undefined}
+            aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
+            className={`${fieldClass} pr-14 placeholder:tracking-[0.18em]`}
+          />
+          <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="login-password" />
+        </div>
         {/* Shared by the password's empty-field note and the server's answer, which sits right under the fields it's
             about. An empty field comes first: it's the thing to fix before anything is sent. */}
         <NoteLine id="login-password-note" text={gaps.password || problem} alert />
