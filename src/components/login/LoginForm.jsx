@@ -33,7 +33,6 @@ export default function LoginForm()
           Welcome to
           <img src={wordmark} alt="SleekBoard" className="mt-3.5 block h-[30px] w-auto" />
         </h1>
-        <p className="mt-4 text-xl tracking-[-0.01em] text-ink-2">Please Enter your Account details</p>
 
         <label htmlFor="login-email" className={`${labelClass} mt-[46px]`}>Email</label>
         <input
