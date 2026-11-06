@@ -456,7 +456,7 @@ export default function AddJob({ open, onClose, onAdd, onJobChange })
                 className={`absolute top-1/2 right-2 flex h-10 -translate-y-1/2 cursor-pointer items-center gap-1.5 rounded-xl bg-cream px-3.5 text-[13px] font-semibold text-canvas transition-[opacity,scale] duration-100 enabled:hover:opacity-90 enabled:active:scale-[0.97] ${busy ? "cursor-progress" : "disabled:cursor-default disabled:opacity-30"} ${focusRing}`}
               >
                 <SparkleIcon size={14} className={busy ? "motion-safe:animate-pulse" : ""} />
-                {reading ? "Reading" : finding ? "Finding contacts" : "Fill in"}
+                {reading ? "Reading" : finding ? "Finding contacts" : "Fill In"}
               </button>
             </div>
 

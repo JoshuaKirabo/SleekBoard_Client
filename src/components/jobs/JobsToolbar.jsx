@@ -86,7 +86,7 @@ export default function JobsToolbar({ view, onView, query, onQuery, total, onAdd
 
           <button type="button" onClick={onAdd} className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-ink pr-4 pl-3 text-[13px] font-semibold text-canvas transition-[opacity,transform] duration-100 hover:opacity-90 active:scale-[0.97] ${focusRing} focus-visible:outline-ink`}>
             <PlusIcon size={15} />
-            Add job
+            Add Job
           </button>
         </div>
       </div>

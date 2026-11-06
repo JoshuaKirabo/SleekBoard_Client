@@ -5,7 +5,7 @@ import nimbusMark from "../../assets/login/nimbus-mark.png";
 // The first three lanes of the real board, with their real names and colours.
 const LANES = STATUSES.slice(0, 3);
 
-// Which lane the card sits in for each feature: it's saved while Fill in and Contact finder run, and the Gmail
+// Which lane the card sits in for each feature: it's saved while Fill In and Contact Finder run, and the Gmail
 // reply moves it to Interviewing.
 const LANE_FOR_STEP = [0, 0, 2];
 

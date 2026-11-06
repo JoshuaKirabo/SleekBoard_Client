@@ -1,21 +1,28 @@
 import { useState } from "react";
 import BoardPreview from "./BoardPreview.jsx";
+import ContactFinderMark from "./ContactFinderMark.jsx";
+import FillInMark from "./FillInMark.jsx";
+import GmailSyncMark from "./GmailSyncMark.jsx";
 
-// What SleekBoard does for you, one at a time: what happens, then the feature's name and what it saves you.
+// What SleekBoard does for you, one at a time: what happens, then the feature's name and what it saves you. A feature
+// with a Mark wears it beside its name.
 const FEATURES = [
   {
     text: "Paste a job link and SleekBoard reads the posting for you. The role, company and location land on the card in one press.",
-    name: "Fill in",
+    name: "Fill In",
+    Mark: FillInMark,
     line: "No more copy and paste",
   },
   {
     text: "SleekBoard finds a recruiter or hiring manager at the company, so every application has a person you can reach out to.",
-    name: "Contact finder",
+    name: "Contact Finder",
+    Mark: ContactFinderMark,
     line: "Someone to talk to, not just a form",
   },
   {
     text: "When a recruiter writes back, the card moves to the right lane by itself. Your board keeps up with your inbox.",
-    name: "Gmail sync",
+    name: "Gmail Sync",
+    Mark: GmailSyncMark,
     line: "Replies move your cards for you",
   },
 ];
@@ -43,7 +50,10 @@ export default function FeaturePanel()
 
         <div key={turn.index} className="login-feature relative mt-10 min-h-[204px]">
           <p className="max-w-[400px] text-[17px] leading-[30px] text-ink">{feature.text}</p>
-          <p className="mt-9 text-[19px] font-semibold tracking-[-0.01em]">{feature.name}</p>
+          <p className="mt-9 flex items-center gap-2.5 text-[19px] font-semibold tracking-[-0.01em]">
+            {feature.Mark && <feature.Mark className="-my-1 size-8 shrink-0 text-cream" />}
+            {feature.name}
+          </p>
           <p className="mt-2 text-[17px] text-cream/70">{feature.line}</p>
         </div>
 

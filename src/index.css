@@ -762,6 +762,37 @@ body
          }
    }
 
+/* The Gmail Sync arrows turn one lap the way they point, rest, then go again, for as long as Gmail Sync is up on
+   the login screen. The rest keeps it reading as a sync, not a loading spinner. */
+.gmail-sync-arrows
+   {
+      transform-box: fill-box;
+      transform-origin: center;
+   }
+
+.gmail-sync-arrows.is-syncing
+   {
+      animation: gmail-sync-turn 2.4s var(--ease-in-out-strong) infinite;
+   }
+
+@keyframes gmail-sync-turn
+   {
+      45%,
+      100%
+         {
+            rotate: -360deg;
+         }
+   }
+
+/* Squashed to nothing, an endless turn would flicker, so reduced motion keeps the arrows still. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .gmail-sync-arrows.is-syncing
+         {
+            animation-name: none;
+         }
+   }
+
 /* Screen swap, between the login screen and the app (see useScreenSwap). Think of the login screen as a door in
    front of the app. Logging out, the app sinks back and the door settles into place from just in front of you.
    Logging in plays the mirror: the door lifts toward you as it fades and the app rises up from behind it. The
