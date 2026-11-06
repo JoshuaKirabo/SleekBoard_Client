@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 // What went wrong, when the server sends you back here with ?signin=error&reason=… after Google.
 const REASONS =
   {
-    not_allowed: "Please use the owner's Google account. Only that account can sign in for now.",
+    not_allowed: "Please use a Google account whose email Google has confirmed.",
     not_linkable: "Please sign in with the Google account you used before. This email belongs to a different one.",
     expired: "Please try again. That sign-in took too long or started in another tab.",
     cancelled: "Please try again. Sign-in was cancelled on Google's side.",
