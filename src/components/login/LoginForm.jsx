@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import GoogleSignIn from "./GoogleSignIn.jsx";
 import ShowPasswordButton from "./ShowPasswordButton.jsx";
+import { shake } from "./shake.js";
 import useScreenSwap from "../useScreenSwap.js";
 import { logIn, problemOf } from "../../services/api.js";
 import { safeNext } from "../auth/nextPath.js";
@@ -26,12 +27,14 @@ const useLastWords = (text) =>
   };
 
 // One reserved line under a field. Empty, it's still there, just see-through and hidden from screen readers.
-function NoteLine({ id, text, alert })
+// `arrival` counts failed sign-ins: each new one remounts the words, so their arrival (index.css, .login-note-arrive)
+// plays again even when the message is the same as last time.
+function NoteLine({ id, text, alert, arrival })
   {
     const words = useLastWords(text);
     return (
       <p id={id} role={alert ? "alert" : undefined} aria-hidden={text ? undefined : true} className={`${noteClass} ${text ? "opacity-100" : "opacity-0"}`}>
-        {words}
+        <span key={arrival} className={arrival ? "login-note-arrive" : undefined}>{words}</span>
       </p>
     );
   }
@@ -68,8 +71,20 @@ export default function LoginForm()
     const [params] = useSearchParams();
     const emailField = useRef(null);
     const passwordField = useRef(null);
+    // The password pill with its eye, which shake together.
+    const passwordBox = useRef(null);
+    // How many sign-ins have failed here, so each one's message arrives again.
+    const [failures, setFailures] = useState(0);
 
     const swap = useScreenSwap();
+
+    // A failed sign-in, after NextStep's: these fields shake, and the message under them arrives again. The shake waits
+    // a frame, as theirs does, so it starts together with the message's new state.
+    const flinch = (fields) =>
+      {
+        setFailures((count) => count + 1);
+        requestAnimationFrame(() => fields.forEach((field) => shake(field.current)));
+      };
 
     // Shows or hides the password, remembering where the caret was so you carry on typing where you left off.
     const togglePassword = () =>
@@ -104,6 +119,7 @@ export default function LoginForm()
         setGapsShown(true);
         setProblem("");
         setMismatch(false);
+        flinch([found.email && emailField, found.password && passwordBox].filter(Boolean));
         (found.email ? emailField : passwordField).current.focus();
       };
 
@@ -115,6 +131,7 @@ export default function LoginForm()
         setBusy(false);
         setProblem(refusalOf(error));
         setMismatch(wrongPair);
+        flinch([passwordBox]);
         if(!wrongPair) return;
         passwordField.current.focus();
         passwordField.current.select();
@@ -168,11 +185,11 @@ export default function LoginForm()
           aria-describedby={gaps.email ? "login-email-note" : mismatch ? "login-password-note" : undefined}
           className={fieldClass}
         />
-        <NoteLine id="login-email-note" text={gaps.email} />
+        <NoteLine id="login-email-note" text={gaps.email} arrival={failures} />
 
         <label htmlFor="login-password" className={`${labelClass} mt-2.5`}>Password</label>
         {/* The eye sits inside the pill's right end, so the text stops short of it. */}
-        <div className="relative">
+        <div ref={passwordBox} className="relative">
           <input
             ref={passwordField}
             id="login-password"
@@ -189,7 +206,7 @@ export default function LoginForm()
         </div>
         {/* Shared by the password's empty-field note and the server's answer, which sits right under the fields it's
             about. An empty field comes first: it's the thing to fix before anything is sent. */}
-        <NoteLine id="login-password-note" text={gaps.password || problem} alert />
+        <NoteLine id="login-password-note" text={gaps.password || problem} alert arrival={failures} />
 
         <label className="mt-3 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-base text-ink-2">
           <input

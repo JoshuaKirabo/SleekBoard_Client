@@ -695,6 +695,50 @@ body
       outline-offset: 2px;
    }
 
+/* A failed sign-in's message, after NextStep's login error: it waits for the field's shake to land, then rises 6px into
+   its line in its own colour, no glow (Josh). Played again on every failure (the words are remounted with a new key).
+   Only transform and opacity move, so its line holds still. */
+.login-note-arrive
+   {
+      display: inline-block;
+      animation: login-note-rise 380ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both;
+   }
+
+@keyframes login-note-rise
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(6px);
+         }
+      to
+         {
+            opacity: 1;
+            transform: translateY(0);
+         }
+   }
+
+/* Less motion: no rise, only a fade in, which says "this is new" without moving anything. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .login-note-arrive
+         {
+            animation: login-note-fade 200ms ease-out both;
+         }
+   }
+
+@keyframes login-note-fade
+   {
+      from
+         {
+            opacity: 0;
+         }
+      to
+         {
+            opacity: 1;
+         }
+   }
+
 /* Flat Cream Team with canvas text, the same as every main button in the app. It never moves. Pointing at it does
    what Log in with Google does, in Board Blue instead of Google's colours: four pools of blue light rise along the
    bottom edge one after another, and a Board Blue line draws itself round the pill from the bottom. The cream stays
