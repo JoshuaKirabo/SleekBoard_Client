@@ -112,7 +112,7 @@ export default function Jobs()
         const answer = params.get("gmail");
         if(!answer) return;
         const reason = params.get("reason") || "";
-        setNotice(answer === "connected" ? "Gmail connected. Replies move your cards within a minute." : `Gmail didn't connect: ${GMAIL_REASONS[reason] || reason || "try again"}.`);
+        setNotice(answer === "connected" ? "Gmail connected. SleekBoard now keeps track of emails from jobs you applied to and moves each card to match." : `Gmail didn't connect: ${GMAIL_REASONS[reason] || reason || "try again"}.`);
         setParams({}, { replace: true });
       }, [params, setParams]);
 

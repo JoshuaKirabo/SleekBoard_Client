@@ -47,7 +47,7 @@ export default function GmailButton({ gmail, onDisconnect })
       <button
         type="button"
         onClick={() => (armed ? onDisconnect() : setArmed(true))}
-        title={armed ? undefined : `Connected as ${gmail.address || "your Gmail"}. Replies move your cards within a minute.`}
+        title={armed ? undefined : `Connected as ${gmail.address || "your Gmail"}. SleekBoard keeps track of emails from jobs you applied to and moves each card to match.`}
         aria-label={armed ? "Click again to disconnect Gmail" : `Gmail connected as ${gmail.address || "your Gmail"}`}
         className={`${pill} ${armed ? "bg-halt/15 text-halt hover:bg-halt/25" : "bg-surface text-ink-2 hover:bg-raised hover:text-ink"}`}
       >
