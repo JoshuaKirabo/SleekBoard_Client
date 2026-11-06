@@ -7,7 +7,7 @@ const labelClass = "block pl-3 text-base text-ink-2";
 // Filled pills in the app's well colours. The fill, hover and focus ring live in index.css.
 const fieldClass = "login-field mt-3.5 h-[52px] w-full rounded-full px-[22px] text-[17px] text-ink placeholder:text-ink-3";
 
-const linkClass = "rounded-sm text-base text-cream underline underline-offset-[3px] transition-colors duration-150 hover:text-ink active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
+const linkClass = "cursor-pointer rounded-sm text-base text-cream underline underline-offset-[3px] transition-colors duration-150 hover:text-ink active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 
 // The left half of the login card: the greeting, email and password, and the ways in.
 export default function LoginForm()
@@ -65,7 +65,7 @@ export default function LoginForm()
           <button type="button" className={linkClass}>Forgot Password</button>
         </div>
 
-        <button type="submit" className="login-submit mt-7 h-[53px] w-full rounded-full text-xl font-semibold tracking-[-0.01em]">
+        <button type="submit" className="login-submit mt-7 cursor-pointer h-[53px] w-full rounded-full text-xl font-semibold tracking-[-0.01em]">
           Sign in
         </button>
 
