@@ -806,3 +806,153 @@ html[data-swap="in"]::view-transition-new(root)
             animation-duration: 150ms;
          }
    }
+
+/* The Job Hunter's opening (pages/JobHunter.jsx). The hunter's icon lands, a typing bubble grows out of it, the line
+   types itself out, and then the roles box comes up underneath. Every step is transform and opacity only. */
+@keyframes hunt-land
+   {
+      from
+         {
+            opacity: 0;
+            transform: scale(0.85);
+         }
+   }
+
+.hunt-avatar
+   {
+      animation: hunt-land 360ms var(--ease-out-strong);
+   }
+
+/* Bubbles grow from the corner nearest the icon, so the message reads as coming from the hunter. */
+@keyframes hunt-bubble-in
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(6px) scale(0.96);
+         }
+   }
+
+.hunt-bubble
+   {
+      transform-origin: 0 0;
+      animation: hunt-bubble-in 320ms var(--ease-out-strong);
+   }
+
+/* The three typing dots, each a beat behind the last. */
+@keyframes hunt-dot
+   {
+      0%, 60%, 100%
+         {
+            opacity: 0.35;
+            transform: translateY(0);
+         }
+      30%
+         {
+            opacity: 1;
+            transform: translateY(-3px);
+         }
+   }
+
+.hunt-dot
+   {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--color-ink-2);
+      animation: hunt-dot 1s ease-in-out infinite;
+      animation-delay: calc(var(--i, 0) * 140ms);
+   }
+
+/* The cursor at the end of the typed words. Its negative margin cancels its width so the words never shift. */
+.hunt-caret
+   {
+      display: inline-block;
+      width: 2px;
+      height: 1.05em;
+      margin-right: -2px;
+      vertical-align: -0.15em;
+      border-radius: 1px;
+      background: var(--color-cream);
+   }
+
+/* The roles box rises a little and settles. Fill is backwards only so the box lets go of its transform once it lands. */
+@keyframes hunt-rise
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+         }
+   }
+
+.hunt-rise
+   {
+      transform-origin: 50% 0;
+      animation: hunt-rise 520ms var(--ease-out-strong) backwards;
+   }
+
+/* Then the chips, in a quick cascade that starts while the box is still settling. */
+@keyframes hunt-chip-in
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(5px);
+         }
+   }
+
+.hunt-chip
+   {
+      animation: hunt-chip-in 360ms var(--ease-out-strong) backwards;
+      animation-delay: calc(160ms + var(--i, 0) * 22ms);
+   }
+
+/* A pick that was just added in the hunt preferences popup, or a count that just changed. A small pop from slightly
+   smaller, never from nothing. */
+@keyframes tag-pop
+   {
+      from
+         {
+            opacity: 0;
+            transform: scale(0.9);
+         }
+   }
+
+.tag-pop
+   {
+      animation: tag-pop 180ms var(--ease-out-strong);
+   }
+
+/* The salary slider: a thin track in the raised grey, cream up to the thumb's spot via accent-color, and a resting
+   look when "Open to any" is on. */
+.hunt-range
+   {
+      accent-color: var(--color-cream);
+      cursor: pointer;
+      height: 20px;
+   }
+
+.hunt-range:disabled
+   {
+      cursor: default;
+      opacity: 0.35;
+   }
+
+/* Reduced motion: everything is simply there. The dots hold still, and the box and chips only fade. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .hunt-avatar,
+      .hunt-bubble,
+      .hunt-dot
+         {
+            animation-name: none;
+         }
+
+      .hunt-rise,
+      .hunt-chip,
+      .tag-pop
+         {
+            animation-name: fade-in;
+         }
+   }
