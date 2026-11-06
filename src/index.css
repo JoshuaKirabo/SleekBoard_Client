@@ -561,6 +561,133 @@ body
          }
    }
 
+/* ---------- Login ---------- */
+
+/* The login screen fills the window. Board Blue at the top left fading to Sleek Gray, with soft blue light high
+   up and a cream glow low on the right, so it keeps the colour of the reference shot without a wash behind it. */
+.login-frame
+   {
+      background:
+         radial-gradient(60% 55% at 22% 18%, rgb(122 159 182 / 0.32) 0%, transparent 70%),
+         radial-gradient(55% 50% at 60% 100%, rgb(219 216 206 / 0.18) 0%, transparent 70%),
+         linear-gradient(160deg, #1c2a33 0%, #24323c 40%, #2a2a2a 100%);
+   }
+
+/* Black pills with a soft dark halo instead of an edge, like the shot. Focus adds a cream ring on top of the halo. */
+.login-field
+   {
+      background: #000;
+      box-shadow: 0 0 22px 4px rgb(0 0 0 / 0.32);
+      caret-color: var(--color-cream);
+      transition: box-shadow 150ms var(--ease-out-strong);
+   }
+
+.login-field:focus-visible
+   {
+      outline: none;
+      box-shadow: 0 0 22px 4px rgb(0 0 0 / 0.32), 0 0 0 3px rgb(219 216 206 / 0.45);
+   }
+
+/* Chrome paints saved logins pale blue. Painting the black back in from the inside keeps the pill whole. */
+.login-field:-webkit-autofill
+   {
+      -webkit-text-fill-color: #fff;
+      box-shadow: inset 0 0 0 60px #000, 0 0 22px 4px rgb(0 0 0 / 0.32);
+   }
+
+.login-check
+   {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-cream);
+      cursor: pointer;
+   }
+
+/* Cream, a touch brighter on the left, so the button reads as lit from the same side as the screen. */
+.login-submit
+   {
+      background: linear-gradient(90deg, #efece5 0%, #dbd8ce 52%, #c9c2b1 100%);
+      color: #232323;
+      box-shadow: 0 10px 28px -12px rgb(0 0 0 / 0.5);
+      transition: scale 100ms ease-out, filter 150ms ease-out;
+   }
+
+.login-submit:hover
+   {
+      filter: brightness(1.04);
+   }
+
+.login-submit:active
+   {
+      scale: 0.97;
+   }
+
+.login-submit:focus-visible
+   {
+      outline: 2px solid var(--color-cream);
+      outline-offset: 3px;
+   }
+
+/* The feature panel. Board Blue deep, with blue light pooling behind the star and a warm cream glow low on the left. */
+.login-feature-panel
+   {
+      background:
+         radial-gradient(circle at 76% 64%, rgb(122 159 182 / 0.55) 0%, rgb(43 65 80 / 0.35) 22%, transparent 46%),
+         radial-gradient(circle at 0% 92%, rgb(219 216 206 / 0.3) 0%, transparent 40%),
+         #121c23;
+   }
+
+/* Each new statement comes in from the right, the way the bars below it fill. */
+.login-feature
+   {
+      animation: login-feature-in 520ms var(--ease-out-strong) backwards;
+   }
+
+@keyframes login-feature-in
+   {
+      from
+         {
+            opacity: 0;
+            translate: 18px 0;
+         }
+   }
+
+/* The lit bar fills over the time a statement stays up, and the next one comes in when it's full. Pointing at the
+   panel or tabbing into it holds the bar, so nothing changes while you're reading. */
+.login-progress-fill
+   {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: var(--color-cream);
+      transform-origin: left center;
+      animation: login-progress 6s linear both;
+   }
+
+@keyframes login-progress
+   {
+      from
+         {
+            scale: 0 1;
+         }
+   }
+
+.login-feature-panel:hover .login-progress-fill,
+.login-feature-panel:focus-within .login-progress-fill
+   {
+      animation-play-state: paused;
+   }
+
+/* Reduced motion squashes every animation to nothing, which would flick through the statements nonstop. The bar is
+   a clock, not movement, so it keeps its six seconds. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .login-progress-fill
+         {
+            animation-duration: 6s !important;
+         }
+   }
+
 /* Screen swap, between the login screen and the app (see useScreenSwap). Think of the login screen as a door in
    front of the app. Logging out, the app sinks back and the door settles into place from just in front of you.
    Logging in plays the mirror: the door lifts toward you as it fades and the app rises up from behind it. The
