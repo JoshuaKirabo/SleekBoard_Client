@@ -1,5 +1,6 @@
 import { STATUSES } from "../jobs/statuses.js";
 import { MailIcon, PersonIcon } from "../icons.jsx";
+import nimbusMark from "../../assets/login/nimbus-mark.png";
 
 // The first three lanes of the real board, with their real names and colours.
 const LANES = STATUSES.slice(0, 3);
@@ -29,7 +30,8 @@ function LiveCard({ step })
     return (
       <div className="card-rise rounded-xl bg-surface p-3 shadow-[0_14px_30px_-14px_rgba(0,0,0,0.7)]">
         <div className="rise flex items-center gap-2" style={{ "--i": 2 }}>
-          <span className="grid size-5 shrink-0 place-items-center rounded-md bg-cream text-[10px] font-bold text-canvas">N</span>
+          {/* On a white tile, the same way the board shows company logos. */}
+          <img src={nimbusMark} alt="" className="size-5 shrink-0 rounded-md bg-white" />
           <span className="truncate text-[12px] font-semibold">Nimbus</span>
           <MailIcon size={12} className={`ml-auto shrink-0 text-cream transition-opacity duration-300 ease-out-strong ${replied ? "opacity-100" : "opacity-0"}`} />
         </div>
