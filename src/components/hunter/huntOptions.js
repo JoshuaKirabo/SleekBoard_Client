@@ -1,13 +1,5 @@
 // Everything the hunt preferences popup offers, and what a hunt looks like before you've picked anything.
 
-export const ROLE_SUGGESTIONS = [
-  "Software Engineer", "Backend Engineer", "Frontend Engineer", "Full Stack Engineer", "Java Engineer", "Python Engineer",
-  "Machine Learning Engineer", "AI Engineer", "LLM Engineer", "Machine Learning/AI Researcher", "Data Scientist",
-  "Data Engineer", "DevOps Engineer", "Site Reliability Engineer", "Cloud Engineer", "Security Engineer",
-  "Mobile Engineer", "iOS Engineer", "Android Engineer", "Embedded Engineer", "QA Engineer", "Product Manager",
-  "UX Designer", "Data Annotation/AI Tutor",
-];
-
 export const LOCATION_SUGGESTIONS = [
   "United States", "Remote in the US", "New York, NY", "San Francisco, CA", "Seattle, WA", "Austin, TX", "Boston, MA",
   "Chicago, IL", "Los Angeles, CA", "Phoenix, AZ", "Canada", "United Kingdom",

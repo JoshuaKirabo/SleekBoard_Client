@@ -939,6 +939,23 @@ html[data-swap="in"]::view-transition-new(root)
       opacity: 0.35;
    }
 
+/* The role picker drops out of the roles box: a short fade and settle from just above, growing from its top edge so
+   it reads as coming out of the box. No exit animation; it goes the moment you're done with it. */
+@keyframes role-menu-in
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(-4px) scale(0.98);
+         }
+   }
+
+.role-menu
+   {
+      transform-origin: 50% 0;
+      animation: role-menu-in 180ms var(--ease-out-strong);
+   }
+
 /* Reduced motion: everything is simply there. The dots hold still, and the box and chips only fade. */
 @media (prefers-reduced-motion: reduce)
    {
@@ -951,7 +968,8 @@ html[data-swap="in"]::view-transition-new(root)
 
       .hunt-rise,
       .hunt-chip,
-      .tag-pop
+      .tag-pop,
+      .role-menu
          {
             animation-name: fade-in;
          }

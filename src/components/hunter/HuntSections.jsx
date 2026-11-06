@@ -1,7 +1,8 @@
 import {
-  ROLE_SUGGESTIONS, LOCATION_SUGGESTIONS, INDUSTRY_SUGGESTIONS, SKILL_SUGGESTIONS,
+  LOCATION_SUGGESTIONS, INDUSTRY_SUGGESTIONS, SKILL_SUGGESTIONS,
   JOB_TYPES, WORK_MODELS, LEVELS, SPONSORSHIP, LIMITS, ROLE_TYPES, STAGES, STAFFING,
 } from "./huntOptions.js";
+import { ALL_ROLES } from "./roleCatalog.js";
 import { Field, Folded } from "./fields/Field.jsx";
 import TagField from "./fields/TagField.jsx";
 import ChoiceTiles from "./fields/ChoiceTiles.jsx";
@@ -62,8 +63,8 @@ export default function HuntSections({ hunt, set, rolesInput })
     return (
       <>
         <Section id="basics" title="The job" index={0}>
-          <Field label="Roles" hint="The jobs you want. Type one and press Enter.">
-            <TagField label="Roles" values={hunt.roles} onChange={set("roles")} suggestions={ROLE_SUGGESTIONS} placeholder="Backend Engineer, AI Engineer…" big inputRef={rolesInput} />
+          <Field label="Roles" hint="The jobs you want. Pick from the list, or type one and press Enter.">
+            <TagField label="Roles" values={hunt.roles} onChange={set("roles")} suggestions={ALL_ROLES} placeholder="Please select/enter your expected job function" big menu inputRef={rolesInput} />
           </Field>
           <Folded label="Titles to skip" count={hunt.excludedTitles.length}>
             <TagField label="Titles to skip" values={hunt.excludedTitles} onChange={set("excludedTitles")} placeholder="Senior, Staff, Principal…" />
