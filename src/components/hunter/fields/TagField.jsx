@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CloseIcon } from "../../icons.jsx";
 import RoleMenu from "./RoleMenu.jsx";
+import PlaceMenu from "./PlaceMenu.jsx";
+import usePlaceSuggestions from "../usePlaceSuggestions.js";
 import { focusRing, well } from "./styles.js";
 
 // Your words, spelled the way the suggestion list spells them when they match one.
@@ -15,14 +17,22 @@ const has = (values, text) => values.some((value) => value.toLowerCase() === tex
 // A list of free-text picks. Type and press Enter; Backspace in an empty box takes the last pick back off. The
 // suggestion list only fixes spelling, so "java engineer" lands as "Java Engineer". With `menu`, clicking the box or
 // typing in it opens the role picker under it; focus alone doesn't, so the popup can open with the box ready to type
-// without a menu over everything. `big` makes it the popup's lead field.
-export default function TagField({ label, values, onChange, suggestions = [], placeholder, big = false, menu = false, inputRef })
+// without a menu over everything. With `places`, typing offers places from anywhere in the world under the box, the
+// way the Kisaka job application's Location does; arrows and Enter pick one. `big` makes it the popup's lead field.
+export default function TagField({ label, values, onChange, suggestions = [], placeholder, big = false, menu = false, places = false, inputRef })
   {
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
+    const [highlighted, setHighlighted] = useState(null);
     const box = useRef(null);
     const ownRef = useRef(null);
     const input = inputRef || ownRef;
+    const listId = useId();
+
+    // The highlight follows a place, not a row, so it stays put when Photon's places join the list.
+    const found = usePlaceSuggestions(query, values, places && open);
+    const showPlaces = places && open && found.length > 0;
+    const active = found.findIndex((place) => place.value === highlighted);
 
     // A press anywhere outside the field closes the picker.
     useEffect(() =>
@@ -38,6 +48,20 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
         const clean = tidy(text, suggestions);
         if(clean && !has(values, clean)) onChange([...values, clean]);
         setQuery("");
+        setHighlighted(null);
+      };
+
+    const pick = (place) =>
+      {
+        add(place.value);
+        setOpen(false);
+      };
+
+    // Down from nothing lands on the first place, up on the last, and both wrap around.
+    const step = (by) =>
+      {
+        const next = active === -1 ? (by > 0 ? 0 : found.length - 1) : (active + by + found.length) % found.length;
+        setHighlighted(found[next].value);
       };
 
     const remove = (value) => onChange(values.filter((item) => item !== value));
@@ -45,7 +69,17 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
 
     const onKeyDown = (event) =>
       {
-        if(event.key === "Enter" || (event.key === "," && query.trim()))
+        if(showPlaces && (event.key === "ArrowDown" || event.key === "ArrowUp"))
+          {
+            event.preventDefault();
+            step(event.key === "ArrowDown" ? 1 : -1);
+          }
+        else if(showPlaces && event.key === "Enter" && active > -1)
+          {
+            event.preventDefault();
+            pick(found[active]);
+          }
+        else if(event.key === "Enter" || (event.key === "," && query.trim()))
           {
             event.preventDefault();
             if(query.trim()) add(query);
@@ -93,18 +127,24 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
             onChange={(event) =>
               {
                 setQuery(event.target.value);
-                if(menu) setOpen(true);
+                setHighlighted(null);
+                if(menu || places) setOpen(true);
               }}
             onClick={() => menu && setOpen(true)}
             onKeyDown={onKeyDown}
             placeholder={values.length ? "" : placeholder}
             aria-label={label}
-            aria-expanded={menu ? open : undefined}
+            aria-expanded={menu ? open : places ? showPlaces : undefined}
+            role={places ? "combobox" : undefined}
+            aria-autocomplete={places ? "list" : undefined}
+            aria-controls={showPlaces ? listId : undefined}
+            aria-activedescendant={showPlaces && active > -1 ? `${listId}-${active}` : undefined}
             className="h-8 min-w-[10ch] flex-1 bg-transparent px-1.5 text-ink placeholder:text-ink-3 focus:outline-none"
           />
         </div>
 
         {menu && open && <RoleMenu query={query} values={values} onToggle={toggle} />}
+        {showPlaces && <PlaceMenu id={listId} places={found} active={active} onPoint={(index) => setHighlighted(found[index].value)} onPick={pick} />}
       </div>
     );
   }

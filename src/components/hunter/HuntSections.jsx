@@ -87,7 +87,7 @@ export default function HuntSections({ hunt, set, rolesInput })
             <ChoiceTiles options={WORK_MODELS} values={hunt.workModels} onChange={set("workModels")} />
           </Field>
           <Field label="Location" onClear={clear("locations")}>
-            <TagField label="Location" values={hunt.locations} onChange={set("locations")} suggestions={LOCATION_SUGGESTIONS} placeholder="A city, state or country" />
+            <TagField label="Location" values={hunt.locations} onChange={set("locations")} suggestions={LOCATION_SUGGESTIONS} placeholder="A city, state or country" places />
           </Field>
           <Field label="Experience level" onClear={clear("levels")}>
             <ChoiceTiles options={LEVELS} values={hunt.levels} onChange={set("levels")} />
