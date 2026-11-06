@@ -5,9 +5,9 @@ import nimbusMark from "../../assets/login/nimbus-mark.png";
 // The first three lanes of the real board, with their real names and colours.
 const LANES = STATUSES.slice(0, 3);
 
-// Which lane the card sits in for each feature: it's saved while Fill In and Contact Finder run, and the Gmail
-// reply moves it to Interviewing.
-const LANE_FOR_STEP = [0, 0, 2];
+// Which lane the card sits in for each feature: it's saved while Fill In runs, applied by the time Contact Finder
+// finds someone, and the Gmail reply moves it to Interviewing.
+const LANE_FOR_STEP = [0, 1, 2];
 
 // Faint stand-in cards under the live one, so the strip reads as a board and not a single card.
 function GhostCard()
