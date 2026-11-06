@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SocialSignIn from "./SocialSignIn.jsx";
 import useScreenSwap from "../useScreenSwap.js";
+import wordmark from "../../assets/brand/wordmark-white.svg";
 
 const labelClass = "block pl-3 text-base text-ink-2";
 
@@ -27,7 +28,11 @@ export default function LoginForm()
 
     return (
       <form onSubmit={handleSubmit} className="w-full max-w-[388px]" noValidate>
-        <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.025em]">Welcome back</h1>
+        {/* The name is the wordmark itself, on its own line under the greeting. Its alt text finishes the sentence. */}
+        <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.025em]">
+          Welcome to
+          <img src={wordmark} alt="SleekBoard" className="mt-3.5 block h-[30px] w-auto" />
+        </h1>
         <p className="mt-4 text-xl tracking-[-0.01em] text-ink-2">Please Enter your Account details</p>
 
         <label htmlFor="login-email" className={`${labelClass} mt-[46px]`}>Email</label>
