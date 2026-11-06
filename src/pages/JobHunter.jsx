@@ -17,7 +17,7 @@ const SAMPLE_HUNT =
       "Machine Learning, Infrastructure", "Machine Learning, Search System", "Data Annotation/AI Tutor", "Machine Learning, Ads",
     ],
     jobTypes: ["Internship"],
-    workModels: ["Onsite", "Hybrid", "Remote anywhere in the US"],
+    workModels: ["Onsite", "Hybrid", "Remote"],
     levels: ["Intern/New Grad", "Entry Level"],
     locations: ["United States"],
     posted: { amount: 24, unit: "hours" },

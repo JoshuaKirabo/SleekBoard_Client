@@ -18,7 +18,7 @@ export const SKILL_SUGGESTIONS = [
 
 // Two columns, read across: Full-time and Contract on the first row, like Jobright.
 export const JOB_TYPES = ["Full-time", "Contract", "Part-time", "Internship"];
-export const WORK_MODELS = ["Onsite", "Hybrid", "Remote anywhere in the US"];
+export const WORK_MODELS = ["Onsite", "Hybrid", "Remote"];
 export const LEVELS = ["Intern/New Grad", "Entry Level", "Mid Level", "Senior Level", "Lead/Staff", "Director/Executive"];
 export const SPONSORSHIP = ["H1B sponsorship"];
 export const LIMITS = ["Security clearance required", "US citizens only"];
