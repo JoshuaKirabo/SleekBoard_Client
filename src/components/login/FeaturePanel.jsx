@@ -4,26 +4,23 @@ import ContactFinderMark from "./ContactFinderMark.jsx";
 import FillInMark from "./FillInMark.jsx";
 import GmailSyncMark from "./GmailSyncMark.jsx";
 
-// What SleekBoard does for you, one at a time: what happens, then the feature's name and what it saves you. A feature
-// with a Mark wears it beside its name.
+// What SleekBoard does for you, one at a time: the feature's name, then what it does. A feature with a Mark wears it
+// beside its name.
 const FEATURES = [
   {
-    text: "Paste a job link and SleekBoard reads the posting for you. The role, company and location land on the card in one press.",
+    text: "Paste a link to any job posting and SleekBoard fills in the role, company and location for you.",
     name: "Fill In",
     Mark: FillInMark,
-    line: "No more copy and paste",
   },
   {
-    text: "SleekBoard finds a recruiter or hiring manager at the company, so every application has a person you can reach out to.",
+    text: "SleekBoard finds a recruiter or hiring manager at each company you apply to, so you always know who to message.",
     name: "Contact Finder",
     Mark: ContactFinderMark,
-    line: "Someone to talk to, not just a form",
   },
   {
-    text: "When a recruiter writes back, the card moves to the right lane by itself. Your board keeps up with your inbox.",
+    text: "SleekBoard keeps track of the emails coming in from jobs you applied to and moves each card to match.",
     name: "Gmail Sync",
     Mark: GmailSyncMark,
-    line: "Replies move your cards for you",
   },
 ];
 
@@ -52,13 +49,13 @@ export default function FeaturePanel()
           Automate your<br />job search.
         </h2>
 
-        <div key={turn.index} className="login-feature relative mt-10 min-h-[204px]">
-          <p className="max-w-[400px] text-[17px] leading-[30px] text-ink">{feature.text}</p>
-          <p className="mt-9 flex items-center gap-2.5 text-[19px] font-semibold tracking-[-0.01em]">
+        {/* Tall enough for the longest statement at four lines, so the bars below never jump between slides. */}
+        <div key={turn.index} className="login-feature relative mt-10 min-h-[168px]">
+          <p className="flex items-center gap-2.5 text-[19px] font-semibold tracking-[-0.01em]">
             {feature.Mark && <feature.Mark className="-my-1 size-8 shrink-0 text-cream" />}
             {feature.name}
           </p>
-          <p className="mt-2 text-[17px] text-cream/70">{feature.line}</p>
+          <p className="mt-4 max-w-[400px] text-[17px] leading-[30px] text-ink">{feature.text}</p>
         </div>
 
         <div className="relative mt-4 flex gap-1.5">
