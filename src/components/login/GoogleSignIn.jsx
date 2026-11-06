@@ -6,7 +6,7 @@ import { googleSignInUrl } from "../../services/api.js";
 export default function GoogleSignIn()
   {
     return (
-      <button type="button" onClick={() => window.location.assign(googleSignInUrl)} className="google-signin flex h-[53px] w-full cursor-pointer items-center justify-center gap-3 rounded-full text-[17px] font-medium">
+      <button type="button" onClick={() => window.location.assign(googleSignInUrl)} className="google-signin flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-full text-base font-medium">
         {/* Four pools of light in the G's colours, behind the label. Styled in index.css under .google-glow. */}
         <span className="google-glow" aria-hidden="true">
           <span />
@@ -26,10 +26,10 @@ export default function GoogleSignIn()
             </linearGradient>
           </defs>
           <g>
-            <rect width="100%" height="100%" rx="25.5" ry="25.5" fill="none" stroke="url(#google-edge-colours)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+            <rect width="100%" height="100%" rx="24" ry="24" fill="none" stroke="url(#google-edge-colours)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
           </g>
         </svg>
-        <GoogleMark className="size-[22px]" />
+        <GoogleMark className="size-5" />
         Log in with Google
       </button>
     );

@@ -6,7 +6,7 @@ const linkClass = "rounded-sm font-medium text-cream transition-colors duration-
 export default function CreateAccountLink()
   {
     return (
-      <p className="mt-8 w-full max-w-[388px] text-center text-[15px] text-ink-3">
+      <p className="mt-5 w-full max-w-[388px] text-center text-sm text-ink-3">
         New here?{" "}
         <Link to="/signup" className={linkClass}>Create an account</Link>
       </p>

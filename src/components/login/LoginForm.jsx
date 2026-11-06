@@ -8,15 +8,15 @@ import { logIn, problemOf } from "../../services/api.js";
 import { safeNext } from "../auth/nextPath.js";
 import wordmark from "../../assets/brand/wordmark-white.svg";
 
-const labelClass = "block pl-3 text-base text-ink-2";
+const labelClass = "block pl-3 text-[15px] text-ink-2";
 
 // Filled pills in the app's well colours. The fill, hover and focus ring live in index.css.
-const fieldClass = "login-field mt-3.5 h-[52px] w-full rounded-full px-[22px] text-[17px] text-ink placeholder:text-ink-3";
+const fieldClass = "login-field mt-1.5 h-[46px] w-full rounded-full px-5 text-base text-ink placeholder:text-ink-3";
 
 // The line under each field, kept in the layout whether or not it has anything to say, so a message showing up never
 // moves the fields or buttons below it (Josh's bookshelf rule: build the shelf for the books to come). One line tall,
 // sized for the longest thing the server says. The words fade in and out; the line itself never comes or goes.
-const noteClass = "mt-1.5 h-[22px] pl-3 text-sm leading-[22px] text-halt transition-opacity duration-200 ease-out";
+const noteClass = "mt-1 h-5 pl-3 text-[13px] leading-5 text-halt transition-opacity duration-200 ease-out";
 
 // The last words a line had, so they stay put while it fades out instead of vanishing first.
 const useLastWords = (text) =>
@@ -167,12 +167,12 @@ export default function LoginForm()
     return (
       <form onSubmit={handleSubmit} className="w-full max-w-[388px]" noValidate>
         {/* The name is the wordmark itself, on its own line under the greeting. Its alt text finishes the sentence. */}
-        <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.025em]">
+        <h1 className="text-center text-[34px] font-semibold leading-[1.05] tracking-[-0.025em]">
           Welcome to
-          <img src={wordmark} alt="SleekBoard" className="mt-3.5 block h-[30px] w-auto" />
+          <img src={wordmark} alt="SleekBoard" className="mx-auto mt-2.5 block h-[25px] w-auto" />
         </h1>
 
-        <label htmlFor="login-email" className={`${labelClass} mt-[46px]`}>Email</label>
+        <label htmlFor="login-email" className={`${labelClass} mt-7`}>Email</label>
         <input
           ref={emailField}
           id="login-email"
@@ -187,7 +187,7 @@ export default function LoginForm()
         />
         <NoteLine id="login-email-note" text={gaps.email} arrival={failures} />
 
-        <label htmlFor="login-password" className={`${labelClass} mt-2.5`}>Password</label>
+        <label htmlFor="login-password" className={`${labelClass} mt-1`}>Password</label>
         {/* The eye sits inside the pill's right end, so the text stops short of it. */}
         <div ref={passwordBox} className="relative">
           <input
@@ -200,7 +200,7 @@ export default function LoginForm()
             onChange={(event) => setPassword(event.target.value)}
             aria-invalid={gaps.password || mismatch ? true : undefined}
             aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
-            className={`${fieldClass} pr-14 placeholder:tracking-[0.18em]`}
+            className={`${fieldClass} pr-12 placeholder:tracking-[0.18em]`}
           />
           <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="login-password" />
         </div>
@@ -208,7 +208,7 @@ export default function LoginForm()
             about. An empty field comes first: it's the thing to fix before anything is sent. */}
         <NoteLine id="login-password-note" text={gaps.password || problem} alert arrival={failures} />
 
-        <label className="mt-3 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-base text-ink-2">
+        <label className="mt-2 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-[15px] text-ink-2">
           <input
             type="checkbox"
             checked={keepLoggedIn}
@@ -219,7 +219,7 @@ export default function LoginForm()
         </label>
 
         {/* Busy while the server checks, so it can't be sent twice. The label says so; index.css changes only the colour. */}
-        <button type="submit" disabled={busy} className="login-submit mt-7 cursor-pointer h-[53px] w-full rounded-full text-xl font-semibold tracking-[-0.01em]">
+        <button type="submit" disabled={busy} className="login-submit mt-5 cursor-pointer h-12 w-full rounded-full text-lg font-semibold tracking-[-0.01em]">
           {/* Four pools of Board Blue light behind the label, the same as Log in with Google's. Styled in index.css under
               .login-submit-glow. */}
           <span className="login-submit-glow" aria-hidden="true">
@@ -231,20 +231,20 @@ export default function LoginForm()
           {/* The Board Blue line drawn round the pill from the bottom on hover. Styled under .login-submit-edge. */}
           <svg className="login-submit-edge" aria-hidden="true">
             <g>
-              <rect width="100%" height="100%" rx="25.5" ry="25.5" fill="none" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+              <rect width="100%" height="100%" rx="24" ry="24" fill="none" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
             </g>
           </svg>
           {busy ? "Signing in…" : "Sign in"}
         </button>
 
         {/* OR between the two ways in, on lines that fade out toward the edges so they don't read as hard rules. */}
-        <div className="mt-7 flex items-center gap-4" aria-hidden="true">
+        <div className="mt-4 flex items-center gap-4" aria-hidden="true">
           <span className="h-px flex-1 bg-linear-to-l from-line-strong to-transparent" />
           <span className="text-xs font-medium tracking-[0.14em] text-ink-3">OR</span>
           <span className="h-px flex-1 bg-linear-to-r from-line-strong to-transparent" />
         </div>
 
-        <div className="mt-7">
+        <div className="mt-4">
           <GoogleSignIn />
         </div>
       </form>
