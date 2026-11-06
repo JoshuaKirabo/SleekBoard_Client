@@ -638,34 +638,73 @@ body
       outline-offset: 3px;
    }
 
-/* Log in with Google sits in the same well colour as the fields, a step below Sign in. It never moves. Pointing at it
-   lifts the well a step and fades in light from the bottom edge in the G's own four colours, the way a job card lights
-   up from below. The G keeps its colours, as Google asks. Pressing dims the light. Every change is an opacity or
-   colour fade on the gentle-both-ways curve, slow enough that the light glides in and drifts back out. */
+/* Log in with Google sits in the same well colour as the fields, a step below Sign in. It never moves or grows.
+   Pointing at it lifts the well a step and lights four pools of colour along its bottom edge, in the G's own order:
+   blue, red, yellow, green. Each pool comes on just after the one before, so the light runs across the button, and
+   all of it stays inside the pill. The G keeps its colours, as Google asks.
+   Pressing dims the light. Every change is an opacity or colour fade on the gentle-both-ways curve. */
 .google-signin
    {
       position: relative;
       isolation: isolate;
-      overflow: hidden;
       background-color: var(--color-surface);
       color: var(--color-ink);
-      transition: background-color 720ms var(--ease-soft);
+      transition: background-color 640ms var(--ease-soft);
    }
 
-.google-signin::before
+/* The light stays inside the button: the pill's own shape clips it. */
+.google-glow
    {
-      content: "";
       position: absolute;
       inset: 0;
       z-index: -1;
+      overflow: hidden;
+      border-radius: inherit;
       pointer-events: none;
-      background:
-         radial-gradient(34% 120% at 14% 130%, rgb(66 133 244 / 0.5) 0%, transparent 70%),
-         radial-gradient(34% 120% at 38% 130%, rgb(234 67 53 / 0.42) 0%, transparent 70%),
-         radial-gradient(34% 120% at 62% 130%, rgb(251 188 5 / 0.38) 0%, transparent 70%),
-         radial-gradient(34% 120% at 86% 130%, rgb(52 168 83 / 0.44) 0%, transparent 70%);
+   }
+
+/* One pool of light, centred on --at and rising from the bottom edge. The blur melts the four into one band. */
+.google-glow span
+   {
+      position: absolute;
+      bottom: -55%;
+      left: var(--at);
+      width: 44%;
+      height: 115%;
+      translate: -50% 0;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgb(var(--glow) / 0.95), rgb(var(--glow) / 0.4) 60%, transparent);
+      filter: blur(11px);
       opacity: 0;
-      transition: opacity 720ms var(--ease-soft);
+      transition: opacity 640ms var(--ease-soft);
+   }
+
+.google-glow span:nth-child(1)
+   {
+      --at: 16%;
+      --glow: 66 133 244;
+      --step: 0ms;
+   }
+
+.google-glow span:nth-child(2)
+   {
+      --at: 39%;
+      --glow: 234 67 53;
+      --step: 70ms;
+   }
+
+.google-glow span:nth-child(3)
+   {
+      --at: 61%;
+      --glow: 251 188 5;
+      --step: 140ms;
+   }
+
+.google-glow span:nth-child(4)
+   {
+      --at: 84%;
+      --glow: 52 168 83;
+      --step: 210ms;
    }
 
 @media (hover: hover) and (pointer: fine)
@@ -673,13 +712,50 @@ body
       .google-signin:hover
          {
             background-color: var(--color-raised);
-            transition-duration: 560ms;
+            transition-duration: 480ms;
          }
 
-      .google-signin:hover::before
+      .google-signin:hover .google-glow span
          {
             opacity: 1;
-            transition-duration: 560ms;
+            transition-duration: 480ms;
+            transition-delay: var(--step);
+         }
+   }
+
+/* The edge light, the same hug the job cards do: a stroke in the G's four colours draws itself round the pill from the
+   bottom on the card hug's fast-start-long-settle curve, and unwinds the same way when you leave. It sits just inside
+   the edge, so it stays in the button. See .job-card-edge for why the box carries the 1px inset. */
+.google-edge
+   {
+      position: absolute;
+      inset: 1px;
+      z-index: 1;
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
+      overflow: visible;
+      pointer-events: none;
+   }
+
+.google-edge g
+   {
+      transform: rotate(180deg);
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+   }
+
+.google-edge rect
+   {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 1180ms var(--ease-premium);
+   }
+
+@media (hover: hover) and (pointer: fine)
+   {
+      .google-signin:hover .google-edge rect
+         {
+            stroke-dashoffset: 0;
          }
    }
 
@@ -687,19 +763,29 @@ body
 .google-signin:active
    {
       background-color: var(--color-surface);
-      transition-duration: 220ms;
+      transition-duration: 200ms;
    }
 
-.google-signin:active::before
+.google-signin:active .google-glow span
    {
-      opacity: 0.55;
-      transition-duration: 220ms;
+      opacity: 0.6;
+      transition-duration: 200ms;
+      transition-delay: 0ms;
    }
 
 .google-signin:focus-visible
    {
       outline: 2px solid var(--color-cream);
       outline-offset: 3px;
+   }
+
+/* Reduced motion: all four pools come on together, with no run across the button. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .google-signin:hover .google-glow span
+         {
+            transition-delay: 0ms;
+         }
    }
 
 /* The feature panel wears the dashboard Insight card's Board Blue, lit from the top left, with a little blue
