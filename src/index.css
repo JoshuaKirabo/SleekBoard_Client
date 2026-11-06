@@ -576,6 +576,8 @@ body
       --login-well: #2a2a2a;
       --login-well-hover: #313131;
       --login-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncG type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncB type='linear' slope='2.6' intercept='-0.8'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      position: relative;
+      isolation: isolate;
       background:
          radial-gradient(40% 55% at 22% 38%, color-mix(in srgb, var(--color-board-light) 22%, transparent) 0%, transparent 100%),
          radial-gradient(90% 70% at 0% 0%, #1d1d1c 0%, var(--color-canvas) 60%, #121212 100%);
@@ -697,28 +699,149 @@ body
    what Log in with Google does, in Board Blue instead of Google's colours: four pools of blue light rise along the
    bottom edge one after another, and a Board Blue line draws itself round the pill from the bottom. The cream stays
    put. Pressing deepens the cream toward Stone and dims the light. Same timings and curves as .google-signin. */
+/* Flat cream at rest. Pointing at it fades it to near-black so the light inside has something dark to glow against;
+   a glow on the cream itself can't be seen. Like every button in the app it only changes colour, never moves. */
 .login-submit
    {
       position: relative;
       isolation: isolate;
       background-color: var(--color-cream);
       color: var(--color-canvas);
-      transition: background-color 320ms ease;
+      transition: background-color 640ms var(--ease-soft), color 640ms var(--ease-soft);
    }
 
+/* The light stays inside the button: the pill's own shape clips it. */
+.login-submit-glow
+   {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      border-radius: inherit;
+      pointer-events: none;
+   }
+
+/* One pool of Board Blue light, centred on --at and rising from the bottom edge of the darkened button. The blur melts
+   the four into one band. Kept soft enough that the white label stays easy to read over it. */
+.login-submit-glow span
+   {
+      position: absolute;
+      bottom: -55%;
+      left: var(--at);
+      width: 44%;
+      height: 115%;
+      translate: -50% 0;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgb(var(--glow) / 0.85), rgb(var(--glow) / 0.35) 60%, transparent);
+      filter: blur(11px);
+      opacity: 0;
+      transition: opacity 640ms var(--ease-soft);
+   }
+
+.login-submit-glow span:nth-child(1)
+   {
+      --at: 16%;
+      --glow: 122 159 182;
+      --step: 0ms;
+   }
+
+.login-submit-glow span:nth-child(2)
+   {
+      --at: 39%;
+      --glow: 96 132 156;
+      --step: 70ms;
+   }
+
+.login-submit-glow span:nth-child(3)
+   {
+      --at: 61%;
+      --glow: 122 159 182;
+      --step: 140ms;
+   }
+
+.login-submit-glow span:nth-child(4)
+   {
+      --at: 84%;
+      --glow: 96 132 156;
+      --step: 210ms;
+   }
+
+/* The edge line, drawn round the pill from the bottom like .google-edge, in the bright Board Blue of the light inside. */
+.login-submit-edge
+   {
+      position: absolute;
+      inset: 1px;
+      z-index: 1;
+      width: calc(100% - 2px);
+      height: calc(100% - 2px);
+      overflow: visible;
+      pointer-events: none;
+   }
+
+.login-submit-edge g
+   {
+      transform: rotate(180deg);
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+   }
+
+/* Hidden at rest as well as fully dashed off, so no stray pixel shows where the line starts and ends. */
+.login-submit-edge rect
+   {
+      stroke: var(--color-board-bright);
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+      transition: stroke-dashoffset 1180ms var(--ease-premium), opacity 200ms ease 1000ms;
+   }
+
+/* Not while busy: a Sign in that's waiting on the server doesn't light up. */
 @media (hover: hover) and (pointer: fine)
    {
-      .login-submit:hover
+      .login-submit:not(:disabled):hover
          {
-            background-color: var(--color-ink);
-            transition-duration: 240ms;
+            background-color: #0c0c0c;
+            color: var(--color-ink);
+            transition-duration: 480ms;
+         }
+
+      .login-submit:not(:disabled):hover .login-submit-glow span
+         {
+            opacity: 1;
+            transition-duration: 480ms;
+            transition-delay: var(--step);
+         }
+
+      .login-submit:not(:disabled):hover .login-submit-edge rect
+         {
+            stroke-dashoffset: 0;
+            opacity: 1;
+            transition: stroke-dashoffset 1180ms var(--ease-premium), opacity 120ms ease;
          }
    }
 
-.login-submit:active
+/* After the hover rules so a press wins over them. Touch screens have no hover, so a tap shows the dimmed light. */
+.login-submit:not(:disabled):active
    {
-      background-color: color-mix(in oklab, var(--color-cream) 75%, var(--color-stone));
-      transition-duration: 160ms;
+      background-color: #161616;
+      color: var(--color-ink);
+      transition-duration: 200ms;
+   }
+
+.login-submit:not(:disabled):active .login-submit-glow span
+   {
+      opacity: 0.6;
+      transition-duration: 200ms;
+      transition-delay: 0ms;
+   }
+
+/* Reduced motion: all four pools come on together, with no run across the button. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .login-submit:not(:disabled):hover .login-submit-glow span
+         {
+            transition-delay: 0ms;
+         }
    }
 
 .login-submit:focus-visible

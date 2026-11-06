@@ -151,6 +151,20 @@ export default function LoginForm()
 
         {/* Busy while the server checks, so it can't be sent twice. The label says so; index.css changes only the colour. */}
         <button type="submit" disabled={busy} className="login-submit mt-7 cursor-pointer h-[53px] w-full rounded-full text-xl font-semibold tracking-[-0.01em]">
+          {/* Four pools of Board Blue light behind the label, the same as Log in with Google's. Styled in index.css under
+              .login-submit-glow. */}
+          <span className="login-submit-glow" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </span>
+          {/* The Board Blue line drawn round the pill from the bottom on hover. Styled under .login-submit-edge. */}
+          <svg className="login-submit-edge" aria-hidden="true">
+            <g>
+              <rect width="100%" height="100%" rx="25.5" ry="25.5" fill="none" strokeWidth="1.5" vectorEffect="non-scaling-stroke" pathLength="1" strokeLinecap="round" />
+            </g>
+          </svg>
           {busy ? "Signing in…" : "Sign in"}
         </button>
 
