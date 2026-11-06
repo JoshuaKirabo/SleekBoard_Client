@@ -1,5 +1,6 @@
 import mark from "../assets/brand/mark-white.svg";
 import LoginForm from "../components/login/LoginForm.jsx";
+import CreateAccountLink from "../components/login/CreateAccountLink.jsx";
 import SignInProblem from "../components/login/SignInProblem.jsx";
 import FeaturePanel from "../components/login/FeaturePanel.jsx";
 
@@ -16,6 +17,7 @@ export default function Login()
           <img src={mark} alt="" className="h-[22px] w-auto self-start" />
           <div className="mx-auto mb-auto w-full max-w-[388px] pt-14 lg:pt-0 lg:mt-[clamp(40px,10.5vh,140px)]">
             <LoginForm />
+            <CreateAccountLink />
             <SignInProblem />
           </div>
         </main>
