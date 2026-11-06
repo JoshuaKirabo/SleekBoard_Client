@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { CloseIcon } from "../../icons.jsx";
 import RoleMenu from "./RoleMenu.jsx";
 import PlaceMenu from "./PlaceMenu.jsx";
-import usePlaceSuggestions from "../usePlaceSuggestions.js";
+import usePlaceSuggestions, { warmPlaces } from "../usePlaceSuggestions.js";
 import { focusRing, well } from "./styles.js";
 
 // Your words, spelled the way the suggestion list spells them when they match one.
@@ -131,6 +131,7 @@ export default function TagField({ label, values, onChange, suggestions = [], pl
                 if(menu || places) setOpen(true);
               }}
             onClick={() => menu && setOpen(true)}
+            onFocus={places ? warmPlaces : undefined}
             onKeyDown={onKeyDown}
             placeholder={values.length ? "" : placeholder}
             aria-label={label}

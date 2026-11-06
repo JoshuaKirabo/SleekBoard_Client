@@ -4,12 +4,28 @@ import { placeSearch, REMOTE_WAIT } from "./placeSearch.js";
 // One empty list, so the memos below don't redo their work for a fresh [] each render.
 const NONE = [];
 
-// The places to offer for what's typed: our own list straight away, Photon's joining it once typing pauses. A reply
-// for words you've since changed is thrown away. Nothing is asked while `on` is false.
+// A head start for a box about to be typed in: the place file starts loading on focus, as Kisaka's does.
+export const warmPlaces = () => placeSearch.load();
+
+// The places to offer for what's typed: our own list straight away (the place file loads the first time), Photon's
+// joining it once typing pauses. A reply for words you've since changed is thrown away. Nothing is asked while `on`
+// is false.
 export default function usePlaceSuggestions(query, picked, on)
   {
     const [found, setFound] = useState({ query: "", places: [] });
-    const local = useMemo(() => (on ? placeSearch.local(query) : NONE), [on, query]);
+    const [loaded, setLoaded] = useState(false);
+    const local = useMemo(() => (on ? placeSearch.local(query) : NONE), [on, query, loaded]);
+
+    useEffect(() =>
+      {
+        if(!on || loaded) return;
+        let live = true;
+        placeSearch.load().then((ok) => live && ok && setLoaded(true));
+        return () =>
+          {
+            live = false;
+          };
+      }, [on, loaded]);
 
     useEffect(() =>
       {

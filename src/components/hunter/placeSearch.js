@@ -1,10 +1,13 @@
 import { LOCATION_SUGGESTIONS } from "./huntOptions.js";
 import { US_STATES } from "./usStates.js";
 
-// The Location type-ahead, the same as the Kisaka job application's. Our short list answers first, in its own order.
-// Photon (photon.komoot.io, OpenStreetMap data, no key) knows every town in the world, so "Sammamish" finds
-// Sammamish, WA. Only the Location text is sent, once three letters are in and typing has paused; a slow or missing
-// Photon only means fewer suggestions, and whatever you type is still kept.
+// The Location type-ahead, the same as the Kisaka job application's. Our own places answer first, in their own
+// order: the hunt's short list, then public/data/places.json (every US state, city and town of 1,000 people and up,
+// and Uganda's places from Kisaka's list; scripts/build_place_list.py builds it). The file loads the first time the
+// box is used. Photon (photon.komoot.io, OpenStreetMap data, no key) knows every town in the world and fills in the
+// rest. Only the Location text is sent, once three letters are in and typing has paused; a slow or missing Photon
+// only means fewer suggestions, and whatever you type is still kept.
+const PLACES_URL = "/data/places.json";
 const PHOTON = "https://photon.komoot.io/api/?limit=8&lang=en&osm_tag=place&q=";
 const MAX_SHOWN = 8;
 const REMOTE_MIN = 3;
@@ -24,10 +27,43 @@ const plain = (text) => String(text || "").toLowerCase()
 // One suggestion: `label` and `country` are what the menu shows, `value` is what lands in the field.
 const placeOf = (label, country, value) => ({ label, country, value, plain: plain(value) });
 
+// A place from the file, [place, country]. US places and the countries themselves land as written; the rest take
+// their country, the way Kisaka fills them: "Muyenga, Kampala, Uganda".
+const listed = ([name, country]) => placeOf(name, country, !country || country === "United States" ? name : `${name}, ${country}`);
+
 class PlaceSearch
   {
     #local = LOCATION_SUGGESTIONS.map((name) => placeOf(name, "", name));
+    #loading = null;
     #remote = new Map();
+
+    // Loads the place file once, however many boxes ask; true once it's in. If it can't be had, the short list is all
+    // there is, and the next use tries again.
+    load()
+      {
+        if(!this.#loading)
+          {
+            this.#loading = fetch(PLACES_URL)
+              .then((response) =>
+                {
+                  if(!response.ok) throw new Error("Place list not found");
+                  return response.json();
+                })
+              .then((data) =>
+                {
+                  const places = (data.places || []).map(listed);
+                  // The short list keeps its lead but takes the file's country, so "Seattle, WA" reads like the rest.
+                  this.#local = [...this.#local.map((own) => places.find((place) => place.plain === own.plain) || own), ...places];
+                  return true;
+                })
+              .catch(() =>
+                {
+                  this.#loading = null;
+                  return false;
+                });
+          }
+        return this.#loading;
+      }
 
     // Our own places that match: every typed word must start a word in the name. Ones that start with the whole of
     // what was typed come first, and the list's order holds after that.
