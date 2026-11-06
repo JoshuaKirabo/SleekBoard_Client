@@ -6,7 +6,7 @@ import HuntSections, { SECTIONS } from "./HuntSections.jsx";
 import { focusRing } from "./fields/styles.js";
 
 // Each item in the left-hand list is this tall, so the highlight behind the active one can slide by whole steps.
-const NAV_ITEM_PX = 64;
+const NAV_ITEM_PX = 48;
 // A section counts as the one you're reading once its title is within this far of the top of the scroll area.
 const READING_LINE_PX = 120;
 
@@ -60,10 +60,7 @@ function SectionNav({ hunt, active, onPick, rise })
             const on = section.id === active;
             return (
               <button key={section.id} type="button" onClick={() => onPick(section.id)} aria-current={on ? "true" : undefined} className={`relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 text-left transition-colors duration-150 ${on ? "text-ink" : "text-ink-2 hover:text-ink"} ${focusRing}`} style={{ height: NAV_ITEM_PX }}>
-                <span className="min-w-0">
-                  <span className="block truncate text-[14.5px] font-semibold">{section.title}</span>
-                  <span className="block truncate text-[12.5px] text-ink-3">{section.hint}</span>
-                </span>
+                <span className="min-w-0 truncate text-[14.5px] font-semibold">{section.title}</span>
                 {count > 0 && <span key={count} className="tag-pop text-[13px] font-semibold text-cream tabular-nums">{count}</span>}
               </button>
             );

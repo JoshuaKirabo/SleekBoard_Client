@@ -22,31 +22,26 @@ export const SECTIONS = [
   {
     id: "basics",
     title: "Basic job criteria",
-    hint: "Job function, type, work model…",
     count: (hunt) => sum(hunt.roles, hunt.jobTypes, hunt.workModels, hunt.locations, hunt.levels) + limited(hunt.experience) + (hunt.posted ? 1 : 0),
   },
   {
     id: "pay",
     title: "Compensation and sponsorship",
-    hint: "Annual salary, H1B sponsorship",
     count: (hunt) => limited(hunt.salary) + sum(hunt.sponsorship, hunt.limits),
   },
   {
     id: "interests",
     title: "Areas of interest",
-    hint: "Industry, skill, role type",
     count: (hunt) => sum(hunt.industries, hunt.excludedIndustries, hunt.skills, hunt.excludedSkills, hunt.roleTypes),
   },
   {
     id: "companies",
     title: "Company insights",
-    hint: "Companies, stage, staffing agencies",
     count: (hunt) => sum(hunt.companies, hunt.stages, hunt.staffing, hunt.excludedCompanies),
   },
   {
     id: "timing",
     title: "Timing",
-    hint: "Start and graduation dates",
     count: (hunt) => filled(hunt.start) + filled(hunt.graduation),
   },
 ];
@@ -76,7 +71,7 @@ export default function HuntSections({ hunt, set, rolesInput })
     return (
       <>
         <Section id="basics" index={0}>
-          <Field label="Job function" hint="Pick from the list for the best results, or type one and press Enter.">
+          <Field label="Job function">
             <TagField label="Job function" values={hunt.roles} onChange={set("roles")} suggestions={ALL_ROLES} placeholder="Please select/enter your expected job function" big menu inputRef={rolesInput} />
           </Field>
           <Field label="Job type">
@@ -91,10 +86,10 @@ export default function HuntSections({ hunt, set, rolesInput })
           <Field label="Experience level">
             <ChoiceTiles options={LEVELS} values={hunt.levels} onChange={set("levels")} />
           </Field>
-          <Field label="Required experience" hint="Skip jobs that ask for more years than this.">
+          <Field label="Required experience">
             <LimitField value={hunt.experience} onChange={set("experience")} max={EXPERIENCE.max} step={EXPERIENCE.step} describe={years} anyLabel="Any requirements" sliderLabel="Most years of experience a job may ask for" />
           </Field>
-          <Field label="Date posted" hint="How new a job has to be for me to bring it to you." onClear={clear("posted", null)}>
+          <Field label="Date posted" onClear={clear("posted", null)}>
             <PostedWithin value={hunt.posted} onChange={set("posted")} />
           </Field>
         </Section>
@@ -103,7 +98,7 @@ export default function HuntSections({ hunt, set, rolesInput })
           <Field label="Minimum annual salary">
             <LimitField value={hunt.salary} onChange={set("salary")} max={SALARY.max} step={SALARY.step} describe={thousands} anyLabel="Any salary" sliderLabel="Minimum yearly salary" />
           </Field>
-          <Field label="Work authorization" hint="Jobs that say they sponsor H1B, or come from companies that have recently sponsored H1B for similar roles.">
+          <Field label="Work authorization">
             <ChoiceTiles options={SPONSORSHIP} values={hunt.sponsorship} onChange={set("sponsorship")} />
           </Field>
           <Field label="Exclude jobs with limitations">
@@ -130,7 +125,7 @@ export default function HuntSections({ hunt, set, rolesInput })
         </Section>
 
         <Section id="companies" index={3}>
-          <Field label="Company" hint="Leave it empty to hear about any company." onClear={clear("companies")}>
+          <Field label="Company" onClear={clear("companies")}>
             <TagField label="Company" values={hunt.companies} onChange={set("companies")} placeholder="NVIDIA, Stripe…" />
           </Field>
           <Field label="Company stage" onClear={clear("stages")}>
