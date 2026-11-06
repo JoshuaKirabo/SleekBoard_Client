@@ -638,6 +638,14 @@ body
       outline-offset: 3px;
    }
 
+/* Busy while the server checks the password: it holds the pressed colour, fading there like any other change, and
+   pointing at it doesn't brighten it. Nothing moves. Comes after :hover so it wins. */
+.login-submit:disabled
+   {
+      background-color: color-mix(in oklab, var(--color-cream) 75%, var(--color-stone));
+      cursor: progress;
+   }
+
 /* Log in with Google sits in the same well colour as the fields, a step below Sign in. It never moves or grows.
    Pointing at it lifts the well a step and lights four pools of colour along its bottom edge, in the G's own order:
    blue, red, yellow, green. Each pool comes on just after the one before, so the light runs across the button, and
