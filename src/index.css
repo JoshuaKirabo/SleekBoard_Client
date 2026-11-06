@@ -908,6 +908,71 @@ html[data-swap="in"]::view-transition-new(root)
       animation-delay: calc(160ms + var(--i, 0) * 22ms);
    }
 
+/* The hunt under way (components/hunter/HuntRadar.jsx). A beam sweeps the scope once every --sweep, brightest on
+   its leading edge and fading behind it. */
+.hunt-radar
+   {
+      --sweep: 2.4s;
+   }
+
+.hunt-radar-ring
+   {
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 10%, transparent);
+   }
+
+@keyframes hunt-radar-turn
+   {
+      to
+         {
+            rotate: 1turn;
+         }
+   }
+
+.hunt-radar-beam
+   {
+      background: conic-gradient(from 0deg, transparent 0deg 250deg, color-mix(in srgb, var(--color-cream) 6%, transparent) 300deg, color-mix(in srgb, var(--color-cream) 42%, transparent) 359deg, transparent 360deg);
+      animation: hunt-radar-turn var(--sweep) linear infinite;
+   }
+
+/* A found job lights up the moment the beam's edge crosses it, then dims until the next pass. The delay is negative
+   so each blip starts part-way through its cycle, timed to its angle (--at, in degrees from the top). */
+@keyframes hunt-radar-blip
+   {
+      0%
+         {
+            opacity: 1;
+            transform: scale(1.3);
+            box-shadow: 0 0 8px 1px color-mix(in srgb, var(--color-cream) 60%, transparent);
+         }
+      70%, 100%
+         {
+            opacity: 0.3;
+            transform: scale(0.8);
+            box-shadow: 0 0 0 0 transparent;
+         }
+   }
+
+.hunt-radar-blip
+   {
+      animation: hunt-radar-blip var(--sweep) var(--ease-out-strong) infinite;
+      animation-delay: calc(var(--at) * var(--sweep) / 360 - var(--sweep));
+   }
+
+/* Reduced motion: the beam holds still, the blips simply sit on the scope, and the line swaps in place. */
+@media (prefers-reduced-motion: reduce)
+   {
+      .hunt-radar-beam,
+      .hunt-radar-blip
+         {
+            animation: none;
+         }
+
+      .hunt-radar-blip
+         {
+            opacity: 0.8;
+         }
+   }
+
 /* A pick that was just added in the hunt preferences popup, or a count that just changed. A small pop from slightly
    smaller, never from nothing. */
 @keyframes tag-pop
