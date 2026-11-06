@@ -608,28 +608,90 @@ body
       cursor: pointer;
    }
 
-/* Flat Cream Team with canvas text, the same as every main button in the app. */
+/* Flat Cream Team with canvas text, the same as every main button in the app. Like the sign-in coins it never
+   moves: pointing brightens the cream to white, pressing deepens it toward Stone, and both are smooth fades. */
 .login-submit
    {
-      background: var(--color-cream);
+      background-color: var(--color-cream);
       color: var(--color-canvas);
-      transition: scale 100ms var(--ease-out-strong), opacity 150ms var(--ease-out-strong);
+      transition: background-color 320ms ease;
    }
 
-.login-submit:hover
+@media (hover: hover) and (pointer: fine)
    {
-      opacity: 0.9;
+      .login-submit:hover
+         {
+            background-color: var(--color-ink);
+            transition-duration: 240ms;
+         }
    }
 
 .login-submit:active
    {
-      scale: 0.97;
+      background-color: color-mix(in oklab, var(--color-cream) 75%, var(--color-stone));
+      transition-duration: 160ms;
    }
 
 .login-submit:focus-visible
    {
       outline: 2px solid var(--color-cream);
       outline-offset: 3px;
+   }
+
+/* The sign-in coins never move. Pointing at one fills it with its provider's colour and turns the logo white, and
+   pressing deepens the colour a step. Everything is a colour fade: in a little quicker than out, so it answers you
+   but never snaps. Each coin brings its own --brand. */
+.social-coin
+   {
+      --brand: #dbd8ce;
+      --fill: #ffffff;
+      background-color: var(--fill);
+      box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.45);
+      transition: background-color 320ms ease;
+   }
+
+.social-coin path
+   {
+      transition: fill 320ms ease;
+   }
+
+@media (hover: hover) and (pointer: fine)
+   {
+      .social-coin:hover
+         {
+            --fill: var(--brand);
+            transition-duration: 240ms;
+         }
+
+      .social-coin:hover path
+         {
+            fill: #ffffff;
+            transition-duration: 240ms;
+         }
+
+      /* Facebook's f is cut out of its circle, so on a filled coin it takes the coin's colour. */
+      .social-coin:hover .mark-cut
+         {
+            fill: var(--fill);
+         }
+   }
+
+/* After the hover rules so a press wins over them. Touch screens have no hover, so a tap goes straight to this. */
+.social-coin:active
+   {
+      --fill: color-mix(in oklab, var(--brand) 80%, black);
+      transition-duration: 160ms;
+   }
+
+.social-coin:active path
+   {
+      fill: #ffffff;
+      transition-duration: 160ms;
+   }
+
+.social-coin:active .mark-cut
+   {
+      fill: var(--fill);
    }
 
 /* The feature panel wears the dashboard Insight card's Board Blue, lit from the top left, with a little blue
