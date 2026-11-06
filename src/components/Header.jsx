@@ -1,4 +1,5 @@
 import { SettingsIcon, BellIcon } from "./icons.jsx";
+import ProfileMenu from "./ProfileMenu.jsx";
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream";
 const roundButton = `inline-flex h-9 cursor-pointer items-center justify-center rounded-full text-ink-2 transition-colors duration-150 hover:text-ink ${focusRing}`;
@@ -22,13 +23,7 @@ export default function Header({ title })
             <span className="rounded-full bg-surface px-2 py-1 text-[10px] font-semibold text-ink">{user.unread} new</span>
           </button>
 
-          <div className="ml-1 flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cream text-[12px] font-semibold text-surface" aria-hidden="true">{user.initials}</span>
-            <div className="hidden leading-tight sm:block">
-              <p className="text-[13px] font-semibold">{user.name}</p>
-              <p className="text-[11px] text-ink-3">{user.email}</p>
-            </div>
-          </div>
+          <ProfileMenu user={user} />
         </div>
       </header>
     );
