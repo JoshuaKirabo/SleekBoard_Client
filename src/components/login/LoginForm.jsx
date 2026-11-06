@@ -11,8 +11,29 @@ const labelClass = "block pl-3 text-base text-ink-2";
 // Filled pills in the app's well colours. The fill, hover and focus ring live in index.css.
 const fieldClass = "login-field mt-3.5 h-[52px] w-full rounded-full px-[22px] text-[17px] text-ink placeholder:text-ink-3";
 
-// The note under a field left empty: the same size as the line under the form, in the app's brick for something to fix.
-const gapClass = "mt-2 pl-3 text-sm leading-relaxed text-halt";
+// The line under each field, kept in the layout whether or not it has anything to say, so a message showing up never
+// moves the fields or buttons below it (Josh's bookshelf rule: build the shelf for the books to come). One line tall,
+// sized for the longest thing the server says. The words fade in and out; the line itself never comes or goes.
+const noteClass = "mt-1.5 h-[22px] pl-3 text-sm leading-[22px] text-halt transition-opacity duration-200 ease-out";
+
+// The last words a line had, so they stay put while it fades out instead of vanishing first.
+const useLastWords = (text) =>
+  {
+    const last = useRef("");
+    if(text) last.current = text;
+    return text || last.current;
+  };
+
+// One reserved line under a field. Empty, it's still there, just see-through and hidden from screen readers.
+function NoteLine({ id, text, alert })
+  {
+    const words = useLastWords(text);
+    return (
+      <p id={id} role={alert ? "alert" : undefined} aria-hidden={text ? undefined : true} className={`${noteClass} ${text ? "opacity-100" : "opacity-0"}`}>
+        {words}
+      </p>
+    );
+  }
 
 const NO_GAPS = { email: "", password: "" };
 
@@ -116,12 +137,12 @@ export default function LoginForm()
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           aria-invalid={gaps.email || mismatch ? true : undefined}
-          aria-describedby={gaps.email ? "login-email-gap" : mismatch ? "login-problem" : undefined}
+          aria-describedby={gaps.email ? "login-email-note" : mismatch ? "login-password-note" : undefined}
           className={fieldClass}
         />
-        {gaps.email && <p id="login-email-gap" className={gapClass}>{gaps.email}</p>}
+        <NoteLine id="login-email-note" text={gaps.email} />
 
-        <label htmlFor="login-password" className={`${labelClass} mt-4`}>Password</label>
+        <label htmlFor="login-password" className={`${labelClass} mt-2.5`}>Password</label>
         <input
           ref={passwordField}
           id="login-password"
@@ -131,15 +152,14 @@ export default function LoginForm()
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           aria-invalid={gaps.password || mismatch ? true : undefined}
-          aria-describedby={gaps.password ? "login-password-gap" : mismatch ? "login-problem" : undefined}
+          aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
           className={`${fieldClass} placeholder:tracking-[0.18em]`}
         />
-        {gaps.password && <p id="login-password-gap" className={gapClass}>{gaps.password}</p>}
+        {/* Shared by the password's empty-field note and the server's answer, which sits right under the fields it's
+            about. An empty field comes first: it's the thing to fix before anything is sent. */}
+        <NoteLine id="login-password-note" text={gaps.password || problem} alert />
 
-        {/* The server's answer sits right under the fields it's about, in the same brick as the empty-field notes. */}
-        {problem && <p id="login-problem" role="alert" className={gapClass}>{problem}</p>}
-
-        <label className="mt-6 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-base text-ink-2">
+        <label className="mt-3 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-base text-ink-2">
           <input
             type="checkbox"
             checked={keepLoggedIn}
