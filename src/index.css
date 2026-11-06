@@ -1330,6 +1330,248 @@ html[data-swap="in"]::view-transition-new(root)
          }
    }
 
+/* Login and sign-up (useScreenSwap's "form-signup" and "form-login", played by AccountSwitch). The page doesn't change, the form grows into
+   the other one. The pieces both forms have (the greeting, Email, Password, the two buttons, OR and the line at the
+   bottom) are named only while the swap runs, so each glides from where it was to where it lands and resizes on the
+   way. The pieces only one form has (Name, Confirm password, the terms box, Keep me logged in) materialise in place
+   once the shared pieces have started moving, a beat apart from the top down, or dissolve where they stand. The
+   feature panel and the rest of the page sit still: nothing outside the form takes part. */
+html[data-swap^="form"] .vt-greeting
+   {
+      view-transition-name: login-greeting;
+   }
+
+html[data-swap^="form"] .vt-email
+   {
+      view-transition-name: login-email;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-password
+   {
+      view-transition-name: login-password;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-action
+   {
+      view-transition-name: login-action;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-or
+   {
+      view-transition-name: login-or;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-google
+   {
+      view-transition-name: login-google;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-switch
+   {
+      view-transition-name: login-switch;
+      view-transition-class: login-morph;
+   }
+
+html[data-swap^="form"] .vt-name
+   {
+      view-transition-name: signup-name;
+      view-transition-class: login-extra;
+   }
+
+html[data-swap^="form"] .vt-confirm
+   {
+      view-transition-name: signup-confirm;
+      view-transition-class: login-extra;
+   }
+
+html[data-swap^="form"] .vt-terms
+   {
+      view-transition-name: signup-terms;
+      view-transition-class: login-extra;
+   }
+
+html[data-swap^="form"] .vt-keep
+   {
+      view-transition-name: login-keep;
+      view-transition-class: login-extra;
+   }
+
+/* The page itself holds still: its old picture is dropped and its new one shows at once, so the feature panel never
+   dips or ghosts. Everything that changes is one of the named pieces above. */
+html[data-swap^="form"]::view-transition-old(root)
+   {
+      animation: none;
+      opacity: 0;
+   }
+
+html[data-swap^="form"]::view-transition-new(root)
+   {
+      animation: none;
+   }
+
+/* The glide. One curve and one length for every shared piece, so the form moves as one thing. */
+html[data-swap^="form"]::view-transition-group(login-greeting),
+html[data-swap^="form"]::view-transition-group(*.login-morph)
+   {
+      animation-duration: 460ms;
+      animation-timing-function: var(--ease-premium);
+   }
+
+/* Each shared piece fills its moving box, so a pill or button stretches to its new height instead of two sizes
+   showing at once. The greeting keeps its shape and scales from its centre, since it's words and nothing else. */
+html[data-swap^="form"]::view-transition-old(*.login-morph),
+html[data-swap^="form"]::view-transition-new(*.login-morph)
+   {
+      block-size: 100%;
+   }
+
+/* The greeting is a size smaller on sign-up (34px to 30px, the wordmark 25px to 22px, both about 0.88). Its two
+   pictures scale from the top centre along with the glide, the old one down to the new size as it fades and the new
+   one down from the old size as it comes in, so there's only ever one greeting, changing size. */
+html[data-swap^="form"]::view-transition-old(login-greeting),
+html[data-swap^="form"]::view-transition-new(login-greeting)
+   {
+      transform-origin: top center;
+   }
+
+/* The words that change (Sign in to Create account, the line at the bottom) hand over early in the glide. Old and new
+   run on the same clock and curve, so with the browser's additive blend they always sum to full strength: the form
+   never dims mid-swap. */
+html[data-swap^="form"]::view-transition-old(login-greeting),
+html[data-swap^="form"]::view-transition-old(*.login-morph)
+   {
+      animation: swap-fade-out 240ms var(--ease-out-strong) both;
+   }
+
+html[data-swap^="form"]::view-transition-new(login-greeting),
+html[data-swap^="form"]::view-transition-new(*.login-morph)
+   {
+      animation: swap-fade-in 240ms var(--ease-out-strong) both;
+   }
+
+html[data-swap="form-signup"]::view-transition-old(login-greeting)
+   {
+      animation: swap-fade-out 240ms var(--ease-out-strong) both, greeting-to-small 460ms var(--ease-premium) both;
+   }
+
+html[data-swap="form-signup"]::view-transition-new(login-greeting)
+   {
+      animation: swap-fade-in 240ms var(--ease-out-strong) both, greeting-from-large 460ms var(--ease-premium) both;
+   }
+
+html[data-swap="form-login"]::view-transition-old(login-greeting)
+   {
+      animation: swap-fade-out 240ms var(--ease-out-strong) both, greeting-to-large 460ms var(--ease-premium) both;
+   }
+
+html[data-swap="form-login"]::view-transition-new(login-greeting)
+   {
+      animation: swap-fade-in 240ms var(--ease-out-strong) both, greeting-from-small 460ms var(--ease-premium) both;
+   }
+
+@keyframes greeting-to-small
+   {
+      to
+         {
+            transform: scale(0.882);
+         }
+   }
+
+@keyframes greeting-from-large
+   {
+      from
+         {
+            transform: scale(1.133);
+         }
+   }
+
+@keyframes greeting-to-large
+   {
+      to
+         {
+            transform: scale(1.133);
+         }
+   }
+
+@keyframes greeting-from-small
+   {
+      from
+         {
+            transform: scale(0.882);
+         }
+   }
+
+/* A field only one form has. Arriving, it comes into focus a few pixels above its place, moving the way the form is
+   opening; leaving, it softens and goes before the rest have moved far. */
+html[data-swap^="form"]::view-transition-new(*.login-extra)
+   {
+      animation: login-field-arrive 380ms var(--ease-out-strong) 140ms both;
+   }
+
+html[data-swap^="form"]::view-transition-new(signup-confirm)
+   {
+      animation-delay: 180ms;
+   }
+
+html[data-swap^="form"]::view-transition-new(signup-terms)
+   {
+      animation-delay: 220ms;
+   }
+
+html[data-swap^="form"]::view-transition-old(*.login-extra)
+   {
+      animation: login-field-leave 160ms var(--ease-out-strong) both;
+   }
+
+@keyframes login-field-arrive
+   {
+      from
+         {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+            filter: blur(6px);
+         }
+   }
+
+@keyframes login-field-leave
+   {
+      to
+         {
+            opacity: 0;
+            transform: scale(0.98);
+            filter: blur(4px);
+         }
+   }
+
+/* Less motion: nothing travels or blurs. The pieces take their new places at once and the words cross-fade. */
+@media (prefers-reduced-motion: reduce)
+   {
+      html[data-swap^="form"]::view-transition-group(login-greeting),
+      html[data-swap^="form"]::view-transition-group(*.login-morph)
+         {
+            animation: none;
+         }
+
+      html[data-swap^="form"]::view-transition-new(*.login-extra),
+      html[data-swap^="form"]::view-transition-new(login-greeting),
+      html[data-swap^="form"]::view-transition-new(*.login-morph)
+         {
+            animation: swap-fade-in 150ms ease-out both;
+         }
+
+      html[data-swap^="form"]::view-transition-old(*.login-extra),
+      html[data-swap^="form"]::view-transition-old(login-greeting),
+      html[data-swap^="form"]::view-transition-old(*.login-morph)
+         {
+            animation: swap-fade-out 150ms ease-out both;
+         }
+   }
+
 /* The Job Hunter's opening (pages/JobHunter.jsx). The hunter's icon lands, a typing bubble grows out of it, the line
    types itself out, and then the roles box comes up underneath. Every step is transform and opacity only. */
 @keyframes hunt-land

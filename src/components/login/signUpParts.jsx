@@ -16,7 +16,7 @@ export const fieldClass = "login-field mt-1.5 h-[42px] w-full rounded-full px-5 
 // A pill with the eye inside its right end, so the text stops short of it.
 export const passwordFieldClass = `${fieldClass} pr-12`;
 
-export const checkboxLabelClass = "mt-1.5 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-sm text-ink-2";
+export const checkboxLabelClass = "flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-sm text-ink-2";
 
 // The line under each field, kept in the layout whether or not it has anything to say, so a message showing up never
 // moves the fields or buttons below it (Josh's bookshelf rule: build the shelf for the books to come). One line tall,
@@ -48,7 +48,7 @@ export function NoteLine({ id, text, alert, arrival })
 export function Greeting()
   {
     return (
-      <h1 className="text-center text-[30px] font-semibold leading-[1.05] tracking-[-0.025em]">
+      <h1 className="vt-greeting text-center text-[30px] font-semibold leading-[1.05] tracking-[-0.025em]">
         Welcome to
         <img src={wordmark} alt="SleekBoard" className="mx-auto mt-2 block h-[22px] w-auto" />
       </h1>
@@ -60,7 +60,7 @@ export function Greeting()
 export function SubmitButton({ busy, label, busyLabel })
   {
     return (
-      <button type="submit" disabled={busy} className="login-submit mt-4 cursor-pointer h-11 w-full rounded-full text-[17px] font-semibold tracking-[-0.01em]">
+      <button type="submit" disabled={busy} className="vt-action login-submit mt-4 cursor-pointer h-11 w-full rounded-full text-[17px] font-semibold tracking-[-0.01em]">
         {/* Four pools of Board Blue light behind the label, the same as the Google button's. Styled in index.css under
             .login-submit-glow. */}
         <span className="login-submit-glow" aria-hidden="true">
@@ -84,7 +84,7 @@ export function SubmitButton({ busy, label, busyLabel })
 export function OrLine()
   {
     return (
-      <div className="mt-3 flex items-center gap-4" aria-hidden="true">
+      <div className="vt-or mt-3 flex items-center gap-4" aria-hidden="true">
         <span className="h-px flex-1 bg-linear-to-l from-line-strong to-transparent" />
         <span className="text-xs font-medium tracking-[0.14em] text-ink-3">OR</span>
         <span className="h-px flex-1 bg-linear-to-r from-line-strong to-transparent" />

@@ -50,7 +50,8 @@ const gapsIn = ({ email, password }) => ({ email: email.trim() ? "" : "Please en
 // rather than problemOf's "couldn't reach", since the server did answer.
 const refusalOf = (error) => error.response && !error.response.data?.message ? "Please try again. Sign-in didn't work." : problemOf(error);
 
-// The left half of the login card: the greeting, email and password, and the ways in.
+// The left half of the login card: the greeting, email and password, and the ways in. The vt- classes name the pieces
+// that glide to their places on the sign-up page when you switch (index.css, "Login and sign-up").
 export default function LoginForm()
   {
     const [email, setEmail] = useState("");
@@ -167,48 +168,52 @@ export default function LoginForm()
     return (
       <form onSubmit={handleSubmit} className="w-full max-w-[388px]" noValidate>
         {/* The name is the wordmark itself, on its own line under the greeting. Its alt text finishes the sentence. */}
-        <h1 className="text-center text-[34px] font-semibold leading-[1.05] tracking-[-0.025em]">
+        <h1 className="vt-greeting text-center text-[34px] font-semibold leading-[1.05] tracking-[-0.025em]">
           Welcome to
           <img src={wordmark} alt="SleekBoard" className="mx-auto mt-2.5 block h-[25px] w-auto" />
         </h1>
 
-        <label htmlFor="login-email" className={`${labelClass} mt-7`}>Email</label>
-        <input
-          ref={emailField}
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          placeholder="Johndoe@gmail.com"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          aria-invalid={gaps.email || mismatch ? true : undefined}
-          aria-describedby={gaps.email ? "login-email-note" : mismatch ? "login-password-note" : undefined}
-          className={fieldClass}
-        />
-        <NoteLine id="login-email-note" text={gaps.email} arrival={failures} />
-
-        <label htmlFor="login-password" className={`${labelClass} mt-1`}>Password</label>
-        {/* The eye sits inside the pill's right end, so the text stops short of it. */}
-        <div ref={passwordBox} className="relative">
+        <div className="vt-email mt-7">
+          <label htmlFor="login-email" className={labelClass}>Email</label>
           <input
-            ref={passwordField}
-            id="login-password"
-            type={passwordShown ? "text" : "password"}
-            autoComplete="current-password"
-            placeholder="••••••••••"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-invalid={gaps.password || mismatch ? true : undefined}
-            aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
-            className={`${fieldClass} pr-12 placeholder:tracking-[0.18em]`}
+            ref={emailField}
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            placeholder="Johndoe@gmail.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            aria-invalid={gaps.email || mismatch ? true : undefined}
+            aria-describedby={gaps.email ? "login-email-note" : mismatch ? "login-password-note" : undefined}
+            className={fieldClass}
           />
-          <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="login-password" />
+          <NoteLine id="login-email-note" text={gaps.email} arrival={failures} />
         </div>
-        {/* Shared by the password's empty-field note and the server's answer, which sits right under the fields it's
-            about. An empty field comes first: it's the thing to fix before anything is sent. */}
-        <NoteLine id="login-password-note" text={gaps.password || problem} alert arrival={failures} />
 
-        <label className="mt-2 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-[15px] text-ink-2">
+        <div className="vt-password mt-1">
+          <label htmlFor="login-password" className={labelClass}>Password</label>
+          {/* The eye sits inside the pill's right end, so the text stops short of it. */}
+          <div ref={passwordBox} className="relative">
+            <input
+              ref={passwordField}
+              id="login-password"
+              type={passwordShown ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••••"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              aria-invalid={gaps.password || mismatch ? true : undefined}
+              aria-describedby={gaps.password || problem ? "login-password-note" : undefined}
+              className={`${fieldClass} pr-12 placeholder:tracking-[0.18em]`}
+            />
+            <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="login-password" />
+          </div>
+          {/* Shared by the password's empty-field note and the server's answer, which sits right under the fields it's
+              about. An empty field comes first: it's the thing to fix before anything is sent. */}
+          <NoteLine id="login-password-note" text={gaps.password || problem} alert arrival={failures} />
+        </div>
+
+        <label className="vt-extra vt-keep mt-2 flex w-fit cursor-pointer items-center gap-2.5 pl-2 text-[15px] text-ink-2">
           <input
             type="checkbox"
             checked={keepLoggedIn}
@@ -219,7 +224,7 @@ export default function LoginForm()
         </label>
 
         {/* Busy while the server checks, so it can't be sent twice. The label says so; index.css changes only the colour. */}
-        <button type="submit" disabled={busy} className="login-submit mt-5 cursor-pointer h-12 w-full rounded-full text-lg font-semibold tracking-[-0.01em]">
+        <button type="submit" disabled={busy} className="vt-action login-submit mt-5 cursor-pointer h-12 w-full rounded-full text-lg font-semibold tracking-[-0.01em]">
           {/* Four pools of Board Blue light behind the label, the same as Log in with Google's. Styled in index.css under
               .login-submit-glow. */}
           <span className="login-submit-glow" aria-hidden="true">
@@ -238,13 +243,13 @@ export default function LoginForm()
         </button>
 
         {/* OR between the two ways in, on lines that fade out toward the edges so they don't read as hard rules. */}
-        <div className="mt-4 flex items-center gap-4" aria-hidden="true">
+        <div className="vt-or mt-4 flex items-center gap-4" aria-hidden="true">
           <span className="h-px flex-1 bg-linear-to-l from-line-strong to-transparent" />
           <span className="text-xs font-medium tracking-[0.14em] text-ink-3">OR</span>
           <span className="h-px flex-1 bg-linear-to-r from-line-strong to-transparent" />
         </div>
 
-        <div className="mt-4">
+        <div className="vt-google mt-4">
           <GoogleSignIn />
         </div>
       </form>

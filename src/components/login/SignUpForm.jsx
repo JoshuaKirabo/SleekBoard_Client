@@ -47,7 +47,8 @@ const hasGap = (found) => Object.values(found).some(Boolean);
 
 // The sign-up card: the login page's look, with its own fields stacked as in the CureSync reference and its own sizes
 // (signUpParts.jsx). Every field and the terms box keep a reserved line under them, so a message never moves anything.
-// It checks what's typed; making the account on the server is the next step.
+// The vt- classes name the pieces that glide in from the login page (index.css, "Login and sign-up"). It checks what's
+// typed; making the account on the server is the next step.
 export default function SignUpForm()
   {
     const [name, setName] = useState("");
@@ -100,91 +101,101 @@ export default function SignUpForm()
       <form onSubmit={handleSubmit} className="w-full max-w-[388px]" noValidate>
         <Greeting />
 
-        <label htmlFor="signup-name" className={`${labelClass} ${firstLabelGap}`}>Name</label>
-        <input
-          ref={nameField}
-          id="signup-name"
-          type="text"
-          autoComplete="name"
-          placeholder="John Doe"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          aria-invalid={gaps.name ? true : undefined}
-          aria-describedby={gaps.name ? "signup-name-note" : undefined}
-          className={fieldClass}
-        />
-        <NoteLine id="signup-name-note" text={gaps.name} arrival={failures} />
-
-        <label htmlFor="signup-email" className={`${labelClass} ${nextLabelGap}`}>Email</label>
-        <input
-          ref={emailField}
-          id="signup-email"
-          type="email"
-          autoComplete="email"
-          placeholder="Johndoe@gmail.com"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          aria-invalid={gaps.email ? true : undefined}
-          aria-describedby={gaps.email ? "signup-email-note" : undefined}
-          className={fieldClass}
-        />
-        <NoteLine id="signup-email-note" text={gaps.email} arrival={failures} />
-
-        <label htmlFor="signup-password" className={`${labelClass} ${nextLabelGap}`}>Password</label>
-        <div ref={passwordBox} className="relative">
+        <div className={`vt-extra vt-name ${firstLabelGap}`}>
+          <label htmlFor="signup-name" className={labelClass}>Name</label>
           <input
-            ref={passwordField}
-            id="signup-password"
-            type={passwordShown ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder={`At least ${SHORTEST_PASSWORD} characters`}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-invalid={gaps.password ? true : undefined}
-            aria-describedby={gaps.password ? "signup-password-note" : undefined}
-            className={passwordFieldClass}
+            ref={nameField}
+            id="signup-name"
+            type="text"
+            autoComplete="name"
+            placeholder="John Doe"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            aria-invalid={gaps.name ? true : undefined}
+            aria-describedby={gaps.name ? "signup-name-note" : undefined}
+            className={fieldClass}
           />
-          <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="signup-password" compact />
+          <NoteLine id="signup-name-note" text={gaps.name} arrival={failures} />
         </div>
-        <NoteLine id="signup-password-note" text={gaps.password} arrival={failures} />
 
-        <label htmlFor="signup-confirm" className={`${labelClass} ${nextLabelGap}`}>Confirm password</label>
-        <div ref={confirmBox} className="relative">
+        <div className={`vt-email ${nextLabelGap}`}>
+          <label htmlFor="signup-email" className={labelClass}>Email</label>
           <input
-            ref={confirmField}
-            id="signup-confirm"
-            type={confirmShown ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder="Type it again"
-            value={confirm}
-            onChange={(event) => setConfirm(event.target.value)}
-            aria-invalid={gaps.confirm ? true : undefined}
-            aria-describedby={gaps.confirm ? "signup-confirm-note" : undefined}
-            className={passwordFieldClass}
+            ref={emailField}
+            id="signup-email"
+            type="email"
+            autoComplete="email"
+            placeholder="Johndoe@gmail.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            aria-invalid={gaps.email ? true : undefined}
+            aria-describedby={gaps.email ? "signup-email-note" : undefined}
+            className={fieldClass}
           />
-          <ShowPasswordButton shown={confirmShown} onToggle={toggleConfirm} controls="signup-confirm" compact />
+          <NoteLine id="signup-email-note" text={gaps.email} arrival={failures} />
         </div>
-        <NoteLine id="signup-confirm-note" text={gaps.confirm} arrival={failures} />
 
-        <label className={checkboxLabelClass}>
-          <input
-            ref={termsBox}
-            type="checkbox"
-            checked={agreed}
-            onChange={(event) => setAgreed(event.target.checked)}
-            aria-invalid={gaps.terms ? true : undefined}
-            aria-describedby={gaps.terms ? "signup-terms-note" : undefined}
-            className="login-check"
-          />
-          I agree to the Terms and Privacy Policy
-        </label>
-        <NoteLine id="signup-terms-note" text={gaps.terms} arrival={failures} />
+        <div className={`vt-password ${nextLabelGap}`}>
+          <label htmlFor="signup-password" className={labelClass}>Password</label>
+          <div ref={passwordBox} className="relative">
+            <input
+              ref={passwordField}
+              id="signup-password"
+              type={passwordShown ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder={`At least ${SHORTEST_PASSWORD} characters`}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              aria-invalid={gaps.password ? true : undefined}
+              aria-describedby={gaps.password ? "signup-password-note" : undefined}
+              className={passwordFieldClass}
+            />
+            <ShowPasswordButton shown={passwordShown} onToggle={togglePassword} controls="signup-password" compact />
+          </div>
+          <NoteLine id="signup-password-note" text={gaps.password} arrival={failures} />
+        </div>
+
+        <div className={`vt-extra vt-confirm ${nextLabelGap}`}>
+          <label htmlFor="signup-confirm" className={labelClass}>Confirm password</label>
+          <div ref={confirmBox} className="relative">
+            <input
+              ref={confirmField}
+              id="signup-confirm"
+              type={confirmShown ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder="Type it again"
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+              aria-invalid={gaps.confirm ? true : undefined}
+              aria-describedby={gaps.confirm ? "signup-confirm-note" : undefined}
+              className={passwordFieldClass}
+            />
+            <ShowPasswordButton shown={confirmShown} onToggle={toggleConfirm} controls="signup-confirm" compact />
+          </div>
+          <NoteLine id="signup-confirm-note" text={gaps.confirm} arrival={failures} />
+        </div>
+
+        <div className="vt-extra vt-terms mt-1.5">
+          <label className={checkboxLabelClass}>
+            <input
+              ref={termsBox}
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => setAgreed(event.target.checked)}
+              aria-invalid={gaps.terms ? true : undefined}
+              aria-describedby={gaps.terms ? "signup-terms-note" : undefined}
+              className="login-check"
+            />
+            I agree to the Terms and Privacy Policy
+          </label>
+          <NoteLine id="signup-terms-note" text={gaps.terms} arrival={failures} />
+        </div>
 
         <SubmitButton busy={false} label="Create account" busyLabel="Creating account…" />
 
         <OrLine />
 
-        <div className="mt-3">
+        <div className="vt-google mt-3">
           <GoogleSignIn label="Sign up with Google" compact />
         </div>
       </form>
